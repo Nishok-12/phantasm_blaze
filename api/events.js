@@ -34,10 +34,7 @@ router.post("/register", requireAuth, async (req, res) => {
         }
 
         // Validate teammate count
-        if (teammates.length !== maxTeammates)
-            return res.status(400).json({
-                error: `You must provide exactly ${maxTeammates} teammate ID(s) for this event.`
-            });
+        
 
         // Convert teammate IDs: "PBZ_1" -> 1, "0" stays as 0
         const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
