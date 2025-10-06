@@ -1,8 +1,9 @@
 import express from "express";
 import db from "../utils/db.js";
-import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
+import { requireAuth } from "./middleware.js";
 const router = express.Router();
 import nodemailer from "nodemailer";
+
 router.post("/register", requireAuth, async (req, res) => {
     const { eventId, teammates = [] } = req.body;
     const userId = req.user?.userId;
@@ -25,18 +26,15 @@ router.post("/register", requireAuth, async (req, res) => {
         if (eventId === 1) {
             maxTeammates = 1;
             allowSolo = true;
-        } else if ([6,7,8,9].includes(Number(eventId))) {
+        } else if ([6, 7, 8, 9].includes(Number(eventId))) {
             maxTeammates = 3;
             allowSolo = false;
-        } else if ([2,3,4,5].includes(Number(eventId))) {
+        } else if ([2, 3, 4, 5].includes(Number(eventId))) {
             maxTeammates = 0;
             allowSolo = true;
         }
 
-        // Validate teammate count
-        
-
-        // Convert teammate IDs: "PBZ_1" -> 1, "0" stays as 0
+        // Convert teammate IDs: "PSM_1" -> 1, "0" stays as 0
         const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
 
         // For non-solo events, no 0 allowed
@@ -45,7 +43,7 @@ router.post("/register", requireAuth, async (req, res) => {
         }
 
         // Validate numeric IDs
-        if (processedTeammates.some(t => isNaN(t))) 
+        if (processedTeammates.some(t => isNaN(t)))
             return res.status(400).json({ error: "Invalid teammate ID format!" });
 
         // Validate teammates exist (skip 0)
@@ -55,7 +53,7 @@ router.post("/register", requireAuth, async (req, res) => {
                 `SELECT id FROM users WHERE id IN (${validTeammates.map(() => "?").join(",")})`,
                 validTeammates
             );
-            if (existingTeammates.length !== validTeammates.length) 
+            if (existingTeammates.length !== validTeammates.length)
                 return res.status(400).json({ error: "One or more teammate IDs are invalid!" });
         }
 
@@ -64,7 +62,7 @@ router.post("/register", requireAuth, async (req, res) => {
             "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
             [userId, eventId]
         );
-        if (alreadyRegistered.length > 0) 
+        if (alreadyRegistered.length > 0)
             return res.status(400).json({ error: "User already registered for this event!" });
 
         // Insert current user
