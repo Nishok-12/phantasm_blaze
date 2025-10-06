@@ -64,109 +64,130 @@
                         </div>
                 </div>
             </div>
- <button class="register-button" onclick="registerForEvent(3)" >REGISTER NOW</button>
+ <button class="register-button" onclick="registerForEvent(8)" >REGISTER NOW</button>
             
 
             </div>
         </div>
         </div>   
     </div>
-    <script>
-        // Function to toggle the side menu
-        function toggleMenu() {
-            const sideMenu = document.getElementById('sideMenu');
-            const hamburger = document.getElementById('hamburger');
-            const closeIcon = document.getElementById('closeIcon');
-    
-            // Toggle side menu visibility
-            sideMenu.classList.toggle('open');
-    
-            // Toggle visibility of hamburger and close icon
-            if (sideMenu.classList.contains('open')) {
-                hamburger.style.display = 'none';
-                closeIcon.style.display = 'block';
-            } else {
-                hamburger.style.display = 'flex';
-                closeIcon.style.display = 'none';
-            }
-        }
-    
+   <script>
+    // Function to toggle the side menu
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const hamburger = document.getElementById('hamburger');
+        const closeIcon = document.getElementById('closeIcon');
 
-    
-        // Add ripple effect to header, footer, and side menu
+        sideMenu.classList.toggle('open');
 
-        
-function registerForEvent(eventId) {
-    console.log("Starting event registration...");
-
-    fetch('/api/events/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ eventId })
-    })
-    .then(async response => {
-        console.log("Response received:", response.status);
-        
-        if (response.status === 401) {
-            window.location.href = '/login.html';
-        }
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Unknown error");
-        }
-
-        return response.json();
-    })
-    .then(result => {
-        console.log("Registration successful:", result);
-        alert('Event registered successfully!');
-
-        // ✅ Set a flag in localStorage so profile.html can detect and update events
-        localStorage.setItem("updateEvents", "true");
-
-        // Redirect user to profile page where updateRegisteredEvents() is defined
-        window.location.href = "/profile.html";
-    })
-    .catch(error => {
-        console.error("Error occurred:", error);
-        alert(error.message || "An error occurred. Please try again.");
-    });
-}
-
-document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
-
-async function checkAuth(event) {
-    event.preventDefault();
-    
-    try {
-        const response = await fetch("/api/user/check-auth", {
-            method: "GET",
-            credentials: "include"
-        });
-
-        if (response.ok) {
-            window.location.href = "/profile.html";
+        if (sideMenu.classList.contains('open')) {
+            hamburger.style.display = 'none';
+            closeIcon.style.display = 'block';
         } else {
+            hamburger.style.display = 'flex';
+            closeIcon.style.display = 'none';
+        }
+    }
+
+    // ✅ Modified Event Registration Function
+    async function registerForEvent(eventId) {
+        console.log("Starting event registration...");
+
+        try {
+            // Step 1: Get current logged-in user info
+            const userResponse = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!userResponse.ok) {
+                alert("Please log in first!");
+                window.location.href = "/login.html";
+                return;
+            }
+
+            const userData = await userResponse.json();
+            const userId = userData.userId; // Ensure your backend returns this field
+            console.log("Current User ID:", userId);
+
+            // Step 2: Prompt for teammate IDs
+            const teammateInput = prompt("Enter your teammate(s) User ID(s) separated by commas (e.g., PSM_102, PSM_103, PSM_104):", "");
+            if (teammateInput === null) {
+                alert("Registration cancelled.");
+                return;
+            }
+            
+            // Step 3: Parse and build the 'teammates' array
+            let teammates = [];
+            if (teammateInput.trim() !== "") {
+                teammates = teammateInput.split(',').map(id => id.trim());
+            }
+
+            console.log("Teammates:", teammates);
+
+            // Step 4: Send registration data to backend
+            const response = await fetch("/api/events/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                // The backend expects 'teammates' and handles the primary user separately
+                body: JSON.stringify({ eventId, teammates })
+            });
+
+            console.log("Response received:", response.status);
+
+            if (response.status === 401) {
+                window.location.href = "/login.html";
+                return;
+            }
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Unknown error");
+            }
+
+            // Step 5: Success flow
+            console.log("Registration successful:", result);
+            alert("Event registered successfully!");
+            localStorage.setItem("updateEvents", "true");
+            window.location.href = "/profile.html";
+        } catch (error) {
+            console.error("Error occurred:", error);
+            alert(error.message || "An error occurred. Please try again.");
+        }
+    }
+
+    // ✅ Profile Link Auth Check
+    document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+    document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+
+    async function checkAuth(event) {
+        event.preventDefault();
+
+        try {
+            const response = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                window.location.href = "/profile.html";
+            } else {
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        } catch (error) {
+            console.error("Error checking authentication:", error);
             alert("Login first!");
             window.location.href = "/login.html";
         }
-    } catch (error) {
-        console.error("Error checking authentication:", error);
-        alert("Login first!");
-        window.location.href = "/login.html";
     }
-}
 
-
-document.querySelector('.logo').addEventListener('click', function() {
-    window.location.href = 'index.html';
-  });
-    </script>
+    // ✅ Click logo to return to home
+    document.querySelector('.logo').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+</script>
         <footer>
             <p>&copy; 2025 CSEA. All rights reserved.</p>
         </footer>
