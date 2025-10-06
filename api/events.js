@@ -18,6 +18,18 @@ router.post("/register", requireAuth, async (req, res) => {
         );
         if (eventExists.length === 0) return res.status(404).json({ error: "Event not found!" });
 
+        // **NEW: Check user's registration type and existing registrations**
+        const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
+        if (userPass.length > 0 && userPass[0].Pass === 'single') {
+            const [regCount] = await db.query(
+                "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
+                [userId]
+            );
+            if (regCount[0].count > 0) {
+                return res.status(403).json({ error: "You have a 'Single Event' pass and are already registered for an event." });
+            }
+        }
+        
         // Determine rules
         let maxTeammates = 0;
         let allowSolo = true;
@@ -32,9 +44,6 @@ router.post("/register", requireAuth, async (req, res) => {
             maxTeammates = 0;
             allowSolo = true;
         }
-
-        // Validate teammate count
-        
 
         // Convert teammate IDs: "PBZ_1" -> 1, "0" stays as 0
         const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
@@ -94,7 +103,6 @@ router.post("/register", requireAuth, async (req, res) => {
         return res.status(500).json({ error: "Database error!", details: error });
     }
 });
-
 
 async function sendRegistrationEmail(name, email, qrCodeId, event) {
     const transporter = nodemailer.createTransport({
