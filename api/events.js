@@ -19,6 +19,7 @@ router.post("/register", requireAuth, async (req, res) => {
         if (eventExists.length === 0) return res.status(404).json({ error: "Event not found!" });
 
         // **NEW: Check user's registration type and existing registrations**
+
         const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
         if (userPass.length > 0 && userPass[0].Pass === 'single') {
             const [regCount] = await db.query(
@@ -26,8 +27,9 @@ router.post("/register", requireAuth, async (req, res) => {
                 [userId]
             );
             if (regCount[0].count > 0) {
-                return res.status(403).json({ error: "You have a 'Single Event' pass and are already registered for an event." });
+                return res.status(403).json({ error: "Single Event Pass Holders Can Only Register For One Event." });
             }
+
         }
         
         // Determine rules
