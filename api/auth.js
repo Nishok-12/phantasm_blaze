@@ -106,9 +106,23 @@ const queryDatabase = async (query, values) => {
 // User Registration Route with Poster Attachment
 router.post("/register", async (req, res) => {
     try {
-        const { name, college, department, reg_no, year, phone, email, password, accommodation, role, admin_key } = req.body;
+        const {
+            name,
+            college,
+            department,
+            reg_no,
+            year,
+            phone,
+            email,
+            password,
+            accommodation,
+            role,
+            admin_key,
+            transid, // <-- Added transid
+            Pass // <-- Added Pass
+        } = req.body;
 
-        if (!name || !college || !department || !reg_no || !year || !phone || !email || !password || !accommodation || !role) {
+        if (!name || !college || !department || !reg_no || !year || !phone || !email || !password || !accommodation || !role || !transid || !Pass) {
             return res.status(400).json({ error: "All fields are required!" });
         }
 
@@ -123,11 +137,23 @@ router.post("/register", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await db.query(
-            `INSERT INTO users (name, college, department, reg_no, year, phone, email, password, accommodation, role) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [name, college, department, reg_no, year, phone, email, hashedPassword, accommodation, role]
+        // Check if the user already exists by email or registration number
+        const [existingUser] = await db.query(
+            "SELECT id FROM users WHERE email = ? OR reg_no = ?",
+            [email, reg_no]
         );
+
+        if (existingUser.length > 0) {
+            return res.status(409).json({ error: "User with this email or registration number already exists." });
+        }
+
+        // The query needs to be updated to include `transid` and `Pass`
+        const result = await db.query(
+            `INSERT INTO users (name, college, department, reg_no, year, phone, email, password, accommodation, role, transid, Pass) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [name, college, department, reg_no, year, phone, email, hashedPassword, accommodation, role, transid, Pass]
+        );
+
 
         const userId = result.insertId;
         const qrCodeId = `PSM_${userId}`;
