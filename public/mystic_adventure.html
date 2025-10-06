@@ -71,96 +71,126 @@
         </div>
         </div>   
     </div>
-    <script>
-        // Function to toggle the side menu
-        function toggleMenu() {
-            const sideMenu = document.getElementById('sideMenu');
-            const hamburger = document.getElementById('hamburger');
-            const closeIcon = document.getElementById('closeIcon');
-    
-            // Toggle side menu visibility
-            sideMenu.classList.toggle('open');
-    
-            // Toggle visibility of hamburger and close icon
-            if (sideMenu.classList.contains('open')) {
-                hamburger.style.display = 'none';
-                closeIcon.style.display = 'block';
-            } else {
-                hamburger.style.display = 'flex';
-                closeIcon.style.display = 'none';
-            }
-        }
-
-        
-function registerForEvent(eventId) {
-    console.log("Starting event registration...");
-
-    fetch('/api/events/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ eventId })
-    })
-    .then(async response => {
-        console.log("Response received:", response.status);
-        
-         if (response.status === 401) {
-            window.location.href = '/login.html';
-        }
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Unknown error");
-        }
-
-        return response.json();
-    })
-    .then(result => {
-        console.log("Registration successful:", result);
-        alert('Event registered successfully!');
-
-        // ✅ Set a flag in localStorage so profile.html can detect and update events
-        localStorage.setItem("updateEvents", "true");
-
-        // Redirect user to profile page where updateRegisteredEvents() is defined
-        window.location.href = "/profile.html";
-    })
-    .catch(error => {
-        console.error("Error occurred:", error);
-        alert(error.message || "An error occurred. Please try again.");
-    });
-}
-document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
-
-async function checkAuth(event) {
-    event.preventDefault();
-    
-    try {
-        const response = await fetch("/api/user/check-auth", {
-            method: "GET",
-            credentials: "include"
-        });
-
-        if (response.ok) {
-            window.location.href = "/profile.html";
-        } else {
-            alert("Login first!");
-            window.location.href = "/login.html";
-        }
-    } catch (error) {
-        console.error("Error checking authentication:", error);
-        alert("Login first!");
-        window.location.href = "/login.html";
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Non-Tech Event Registration</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #0d0d0d;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-}
 
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 20px;
+      width: 350px;
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.4);
+      text-align: center;
+    }
 
-document.querySelector('.logo').addEventListener('click', function() {
-    window.location.href = 'index.html';
-  });
+    .popup input {
+      width: 90%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+
+    .popup button {
+      margin-top: 15px;
+      background: #00ffd0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .popup button:hover {
+      background: #00b3a1;
+    }
+
+    #openPopup {
+      background: #00ffd0;
+      color: #000;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #openPopup:hover {
+      background: #00b3a1;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="openPopup">Register Non-Tech Event</button>
+
+  <div class="popup" id="popupBox">
+    <h2>Non-Tech Event Registration</h2>
+    <p id="userIdDisplay"></p>
+
+    <input type="text" id="teamMate1" placeholder="Teammate 1 Name">
+    <input type="text" id="teamMate2" placeholder="Teammate 2 Name">
+    <input type="text" id="teamMate3" placeholder="Teammate 3 Name">
+
+    <button id="submitBtn">Submit</button>
+  </div>
+
+  <script>
+    const popup = document.getElementById('popupBox');
+    const openPopupBtn = document.getElementById('openPopup');
+    const userIdDisplay = document.getElementById('userIdDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Example current user ID
+    const currentUserId = "12345"; // You can dynamically fetch this later from backend/session
+    const formattedId = `PSM_${currentUserId}`;
+
+    openPopupBtn.addEventListener('click', () => {
+      userIdDisplay.innerText = `Your User ID: ${formattedId}`;
+      popup.style.display = 'block';
+    });
+
+    submitBtn.addEventListener('click', () => {
+      const t1 = document.getElementById('teamMate1').value;
+      const t2 = document.getElementById('teamMate2').value;
+      const t3 = document.getElementById('teamMate3').value;
+
+      if (t1 && t2 && t3) {
+        alert(`✅ Registration Successful!\n\nUser ID: ${formattedId}\nTeammates:\n1. ${t1}\n2. ${t2}\n3. ${t3}`);
+        popup.style.display = 'none';
+      } else {
+        alert("⚠️ Please fill all three teammate names.");
+      }
+    });
+  </script>
+
+</body>
+</html>
+
 
 
     </script>
