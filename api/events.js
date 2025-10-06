@@ -157,4 +157,19 @@ router.get("/get-events", async (req, res) => {
     }
 });
 
+// Add this new route below the existing ones in events.js
+router.get("/slots-taken/:eventId", async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const [result] = await db.query(
+            "SELECT COUNT(*) AS slotsTaken FROM registrations WHERE event_id = ?",
+            [eventId]
+        );
+        res.json({ slotsTaken: result[0].slotsTaken });
+    } catch (error) {
+        console.error("Error fetching slots:", error);
+        res.status(500).json({ error: "Failed to fetch slots data." });
+    }
+});
+
 export default router;
