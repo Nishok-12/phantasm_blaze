@@ -8,7 +8,7 @@ This system enables students to register for events, while admins can manage eve
 
 ## 🌐 Live URL
 
-👉 [Live Site](https://phantasm.onrender.com)
+👉 [Live Site](https://phantasm-blaze.onrender.com)
 
 ---
 

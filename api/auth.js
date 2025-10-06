@@ -153,7 +153,7 @@ router.post("/register", async (req, res) => {
                 <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
                 <p>Instructions to register for an event:</p>
                 <ul>
-                    <li>Visit our event page: <a href="https://phantasm.onrender.com/events.html">Register Here</a></li>
+                    <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
                     <li>Select an event and confirm your participation.</li>
                 </ul>
                 <p>See you at the event! 🏆</p>
