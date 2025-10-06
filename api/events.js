@@ -4,107 +4,98 @@ import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
 const router = express.Router();
 import nodemailer from "nodemailer";
 router.post("/register", requireAuth, async (req, res) => {
-  console.log("User data in request:", req.user);
-  const { eventId, teammates = [] } = req.body; // teammates from frontend
-  const userId = req.user?.userId;
+    const { eventId, teammates = [] } = req.body;
+    const userId = req.user?.userId;
 
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!eventId) return res.status(400).json({ error: "Event ID is required!" });
 
-  if (!eventId) {
-    return res.status(400).json({ error: "Event ID is required!" });
-  }
+    try {
+        // Check if event exists
+        const [eventExists] = await db.query(
+            "SELECT id, name, date, venue FROM events WHERE id = ?",
+            [eventId]
+        );
+        if (eventExists.length === 0) return res.status(404).json({ error: "Event not found!" });
 
-  try {
-    // 🔍 Check if event exists
-    const [eventExists] = await db.query(
-      "SELECT id, name, date, venue FROM events WHERE id = ?",
-      [eventId]
-    );
+        // Determine rules
+        let maxTeammates = 0;
+        let allowSolo = true;
 
-    if (eventExists.length === 0) {
-      return res.status(404).json({ error: "Event not found!" });
+        if (eventId === 1) {
+            maxTeammates = 1;
+            allowSolo = true;
+        } else if ([6,7,8,9].includes(Number(eventId))) {
+            maxTeammates = 3;
+            allowSolo = false;
+        } else if ([2,3,4,5].includes(Number(eventId))) {
+            maxTeammates = 0;
+            allowSolo = true;
+        }
+
+        // Validate teammate count
+        if (teammates.length !== maxTeammates)
+            return res.status(400).json({
+                error: `You must provide exactly ${maxTeammates} teammate ID(s) for this event.`
+            });
+
+        // Convert teammate IDs: "PBZ_1" -> 1, "0" stays as 0
+        const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
+
+        // For non-solo events, no 0 allowed
+        if (!allowSolo && processedTeammates.some(t => t === 0)) {
+            return res.status(400).json({ error: "All teammates are required for this event, no solo allowed." });
+        }
+
+        // Validate numeric IDs
+        if (processedTeammates.some(t => isNaN(t))) 
+            return res.status(400).json({ error: "Invalid teammate ID format!" });
+
+        // Validate teammates exist (skip 0)
+        const validTeammates = processedTeammates.filter(t => t !== 0);
+        if (validTeammates.length > 0) {
+            const [existingTeammates] = await db.query(
+                `SELECT id FROM users WHERE id IN (${validTeammates.map(() => "?").join(",")})`,
+                validTeammates
+            );
+            if (existingTeammates.length !== validTeammates.length) 
+                return res.status(400).json({ error: "One or more teammate IDs are invalid!" });
+        }
+
+        // Check if current user already registered
+        const [alreadyRegistered] = await db.query(
+            "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
+            [userId, eventId]
+        );
+        if (alreadyRegistered.length > 0) 
+            return res.status(400).json({ error: "User already registered for this event!" });
+
+        // Insert current user
+        await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [userId, eventId]);
+
+        // Insert teammates (non-zero only)
+        for (const t of validTeammates) {
+            await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [t, eventId]);
+        }
+
+        // Insert into teams table (only if teammates exist)
+        const allMembers = [userId, ...validTeammates].join("+");
+        if (validTeammates.length > 0) {
+            await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, allMembers]);
+        }
+
+        // Fetch user for email
+        const [user] = await db.query("SELECT name, email, qr_code_id FROM users WHERE id = ?", [userId]);
+        if (user.length === 0) return res.status(404).json({ error: "User not found!" });
+
+        await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
+
+        return res.status(201).json({ message: "Registration successful!", team: allMembers });
+
+    } catch (error) {
+        console.error("Database error:", error);
+        return res.status(500).json({ error: "Database error!", details: error });
     }
-
-    // 🧩 Define allowed team size
-    const teamSize =
-      eventId == 1
-        ? 2 // user + 1 teammate
-        : [6, 7, 8, 9].includes(Number(eventId))
-        ? 4 // user + 3 teammates
-        : 1; // solo
-
-    // ⚠️ Validate teammate count
-    if (teammates.length !== teamSize - 1) {
-      return res.status(400).json({
-        error: `This event requires ${teamSize} participants in total (${teamSize - 1} teammates).`,
-      });
-    }
-
-    // 🧮 Convert "PBZ_1" → 1
-    const currentUserIdNum = parseInt(String(userId).replace(/\D/g, ""));
-    const teammateIds = teammates.map((t) => parseInt(String(t).replace(/\D/g, "")));
-
-    // 🧩 Check if user already registered
-    const [alreadyRegistered] = await db.query(
-      "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
-      [currentUserIdNum, eventId]
-    );
-
-    if (alreadyRegistered.length > 0) {
-      return res
-        .status(400)
-        .json({ error: "User already registered for this event!" });
-    }
-
-    // ✅ Register all users in registrations table
-    await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [
-      currentUserIdNum,
-      eventId,
-    ]);
-
-    for (const teammateId of teammateIds) {
-      await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [
-        teammateId,
-        eventId,
-      ]);
-    }
-
-    // 🧾 Insert into teams table
-    const allMembers = [currentUserIdNum, ...teammateIds].join("+");
-    await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [
-      eventId,
-      allMembers,
-    ]);
-
-    // 🎫 Fetch user details for email
-    const [user] = await db.query(
-      "SELECT name, email, qr_code_id FROM users WHERE id = ?",
-      [currentUserIdNum]
-    );
-
-    if (user.length === 0) {
-      console.error("Error: User not found in database.");
-      return res.status(404).json({ error: "User not found!" });
-    }
-
-    // ✉️ Send confirmation mail
-    await sendRegistrationEmail(
-      user[0].name,
-      user[0].email,
-      user[0].qr_code_id,
-      eventExists[0]
-    );
-
-    return res.status(201).json({
-      message: "Team registration successful!",
-      team: allMembers,
-    });
-  } catch (error) {
-    console.error("Database error:", error);
-    return res.status(500).json({ error: "Database error!", details: error });
-  }
 });
 
 
