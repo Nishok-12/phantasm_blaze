@@ -162,7 +162,7 @@ router.get("/slots-taken/:eventId", async (req, res) => {
     try {
         const { eventId } = req.params;
         const [result] = await db.query(
-            "SELECT COUNT(*) AS slotsTaken FROM registrations WHERE event_id = ?",
+            "SELECT COUNT(*) AS slotsTaken FROM teams WHERE event_id = ?",
             [eventId]
         );
         res.json({ slotsTaken: result[0].slotsTaken });
