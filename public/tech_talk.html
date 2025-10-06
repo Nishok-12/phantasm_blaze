@@ -72,23 +72,7 @@
         </div>
         </div>   
     </div>
-   <script>
-  // --- Toggle menu ---
-  function toggleMenu() {
-    const sideMenu = document.getElementById('sideMenu');
-    const hamburger = document.getElementById('hamburger');
-    const closeIcon = document.getElementById('closeIcon');
-    sideMenu.classList.toggle('open');
-    if (sideMenu.classList.contains('open')) {
-      hamburger.style.display = 'none';
-      closeIcon.style.display = 'block';
-    } else {
-      hamburger.style.display = 'flex';
-      closeIcon.style.display = 'none';
-    }
-  }
-
-  // --- Create Modal for Registration ---
+   // --- Create Modal for Registration ---
   function showRegistrationModal(userId, eventId) {
     // Remove existing modal if any
     const existing = document.getElementById('registrationModal');
@@ -130,16 +114,17 @@
 
     // Confirm registration
     document.getElementById('confirmBtn').onclick = async () => {
-      const teammateInput = document.getElementById('teammateIdField').value.trim() || '0';
-      const participants = [ `PSM_${userId}` ];
-      if (teammateInput !== '0') participants.push(teammateInput);
+      const teammateInput = document.getElementById('teammateIdField').value.trim();
+      // Correctly format the teammate data as an array named 'teammates'
+      const teammates = teammateInput !== '0' ? [teammateInput] : [];
 
       try {
         const response = await fetch("/api/events/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ eventId, participants })
+          // Send the 'teammates' array in the request body
+          body: JSON.stringify({ eventId, teammates })
         });
 
         const result = await response.json();
@@ -211,7 +196,6 @@
   document.querySelector('.logo').addEventListener('click', function() {
     window.location.href = 'index.html';
   });
-</script>
 
 
         
