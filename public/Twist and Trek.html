@@ -87,7 +87,7 @@
         }
     }
 
-    // ✅ Modified Event Registration Function
+    // Event Registration Function (Requires Login)
     async function registerForEvent(eventId) {
         console.log("Starting event registration...");
 
@@ -156,13 +156,14 @@
     }
 
 
-    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
+    // FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING (DOES NOT REQUIRE LOGIN)
     async function fetchSlotsRemaining() {
-        const eventId = 8; // Query Quest's event ID
-        const totalSlots = 8; // Based on the rules for Query Quest (individual event)
+        const eventId = 8; // Event ID for Twist and Trek
+        const totalSlots = 8; // Define the maximum capacity for this event
         const registerButton = document.querySelector('.register-button');
 
         try {
+            // This fetch call is public and does not rely on authentication
             const response = await fetch(`/api/events/slots-taken/${eventId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch slots data.');
@@ -173,16 +174,17 @@
 
             document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
 
-            // ✅ NEW: Disable button if no slots are remaining
+            // Disable button if no slots are remaining
             if (remaining <= 0) {
                 registerButton.disabled = true;
                 registerButton.textContent = "SLOTS FULL";
-                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
-                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
+                registerButton.style.backgroundColor = "#999"; 
+                registerButton.style.cursor = "not-allowed"; 
             }
         } catch (error) {
             console.error("Error fetching slots:", error);
             document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
+            // Disable button if fetching failed (due to network/server error)
             registerButton.disabled = true;
             registerButton.textContent = "UNAVAILABLE";
             registerButton.style.backgroundColor = "#999";
@@ -193,7 +195,7 @@
     // Call the function when the page loads
     document.addEventListener('DOMContentLoaded', fetchSlotsRemaining);
 
-    // ✅ Profile Link Auth Check
+    // Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
     document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
@@ -219,7 +221,7 @@
         }
     }
 
-    // ✅ Click logo to return to home
+    // Click logo to return to home
     document.querySelector('.logo').addEventListener('click', function() {
         window.location.href = 'index.html';
     });
