@@ -1,262 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" href="logo.png" type="image/x-icon">
-    <title>ClueCraze</title>
-    <link rel="stylesheet" href="nontech.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="logo.png" type="image/x-icon">
+    <title>ClueCraze</title>
+    <link rel="stylesheet" href="nontech.css">
 </head>
 <body>
-    <header>
-        <div class="logo">Phantasm Blaze</div>
-        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="events.html">Events</a>
-            <a href="schedule.html">Schedule</a>
-            <a href="contact-us.html">Contact</a>
+    <header>
+        <div class="logo">Phantasm Blaze</div>
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
 <a href="#" id="profileLinkDesktop">Profile</a>
-            <a href="login.html">Login</a>
-        </nav>
-        <div class="side-menu" id="sideMenu">
-            <a href="index.html">Home</a>
-            <a href="events.html">Events</a>
-            <a href="schedule.html">Schedule</a>
-            <a href="contact-us.html">Contact</a>
+            <a href="login.html">Login</a>
+        </nav>
+        <div class="side-menu" id="sideMenu">
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
 <a href="#" id="profileLinkMobile">Profile</a>
-            <a href="login.html">Login</a>
-        </div>
-    </header>
-    <div class="container">
- 
-        <div class="content">
-            <div class="event-title">ClueCraze <span id="slots-remaining"></span></div>
-            <div class="warning-message">Note: Kindly refer the schedule before registering events</div>
-            <div class="event-section">
-                <div class="box description-box">
-                    <div class="ed">
-                        <div class="front">DESCRIPTION</div>
-                        <div class="back">
-                            <p>Teams of 4 race against time to solve ciphers, logic puzzles, and general knowledge clues to find the hidden treasure. Only the first team to reach it wins, with tie-breakers decided through an extra round. Let the hunt begin!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="box rules-box">
-                    <div class="ed">
-                        <div class="front">RULES</div>
-                            <div class="back">
-                                <ol type="A">
-                                <li>Each team must have 4 members.</li>
-                                <li>Solve a series of clues, puzzles, and mini-challenges based on ciphers, logic, and general knowledge to reach the treasure.</li>
-                                <li>All team members must stay together; no outside help allowed.</li>
-                                <li>The event is time-bound; only the team that finds the treasure wins.</li>
-                                <li>In case of a tie, an extra round will be conducted to declare the winner.</li>
-                            </ol>
-                            </div>
-                            </div>
-                </div>
-            </div>
- <button class="register-button" onclick="registerForEvent(9)" >REGISTER NOW</button>
-            </div>
-        </div>
-        </div>   
-    </div>
-    <script>
-    // Function to toggle the side menu
-    function toggleMenu() {
-        const sideMenu = document.getElementById('sideMenu');
-        const hamburger = document.getElementById('hamburger');
-        const closeIcon = document.getElementById('closeIcon');
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <div class="container">
+ 
+        <div class="content">
+            <div class="event-title">ClueCraze <span id="slots-remaining"></span></div>
+            <div class="warning-message">Note: Kindly refer the schedule before registering events</div>
+            <div class="event-section">
+                <div class="box description-box">
+                    <div class="ed">
+                        <div class="front">DESCRIPTION</div>
+                        <div class="back">
+                            <p>Teams of 4 race against time to solve ciphers, logic puzzles, and general knowledge clues to find the hidden treasure. Only the first team to reach it wins, with tie-breakers decided through an extra round. Let the hunt begin!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="box rules-box">
+                    <div class="ed">
+                        <div class="front">RULES</div>
+                            <div class="back">
+                                <ol type="A">
+                                <li>Each team must have 4 members.</li>
+                                <li>Solve a series of clues, puzzles, and mini-challenges based on ciphers, logic, and general knowledge to reach the treasure.</li>
+                                <li>All team members must stay together; no outside help allowed.</li>
+                                <li>The event is time-bound; only the team that finds the treasure wins.</li>
+                                <li>In case of a tie, an extra round will be conducted to declare the winner.</li>
+                            </ol>
+                            </div>
+                            </div>
+                </div>
+            </div>
+ <button class="register-button" onclick="registerForEvent(9)" >REGISTER NOW</button>
+            </div>
+        </div>
+        </div>   
+    </div>
+    <script>
+    // Function to toggle the side menu
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const hamburger = document.getElementById('hamburger');
+        const closeIcon = document.getElementById('closeIcon');
 
-        sideMenu.classList.toggle('open');
+        sideMenu.classList.toggle('open');
 
-        if (sideMenu.classList.contains('open')) {
-            hamburger.style.display = 'none';
-            closeIcon.style.display = 'block';
-        } else {
-            hamburger.style.display = 'flex';
-            closeIcon.style.display = 'none';
-        }
-    }
+        if (sideMenu.classList.contains('open')) {
+            hamburger.style.display = 'none';
+            closeIcon.style.display = 'block';
+        } else {
+            hamburger.style.display = 'flex';
+            closeIcon.style.display = 'none';
+        }
+    }
 
-    // ✅ Modified Event Registration Function
-    async function registerForEvent(eventId) {
-        console.log("Starting event registration...");
+    // ✅ Modified Event Registration Function
+    async function registerForEvent(eventId) {
+        console.log("Starting event registration...");
 
-        try {
-            // Step 1: Get current logged-in user info
-            const userResponse = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
+        try {
+            // Step 1: Get current logged-in user info
+            const userResponse = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
 
-            if (!userResponse.ok) {
-                alert("Please log in first!");
-                window.location.href = "/login.html";
-                return;
-            }
+            if (!userResponse.ok) {
+                alert("Please log in first!");
+                window.location.href = "/login.html";
+                return;
+            }
 
-            const userData = await userResponse.json();
-            const userId = userData.userId; // Ensure your backend returns this field
-            console.log("Current User ID:", userId);
+            const userData = await userResponse.json();
+            const userId = userData.userId; // Ensure your backend returns this field
+            console.log("Current User ID:", userId);
 
-            // Step 2: Prompt for teammate IDs
-            const teammateInput = prompt("Enter your teammate(s) User ID(s) separated by commas (e.g., PSM_102, PSM_103, PSM_104):", "");
-            if (teammateInput === null) {
-                alert("Registration cancelled.");
-                return;
-            }
-            
-            // Step 3: Parse and build the 'teammates' array
-            let teammates = [];
-            if (teammateInput.trim() !== "") {
-                teammates = teammateInput.split(',').map(id => id.trim());
-            }
+            // Step 2: Prompt for teammate IDs
+            const teammateInput = prompt("Enter your teammate(s) User ID(s) separated by commas (e.g., PSM_102, PSM_103, PSM_104):", "");
+            if (teammateInput === null) {
+                alert("Registration cancelled.");
+                return;
+            }
+            
+            // Step 3: Parse and build the 'teammates' array
+            let teammates = [];
+            if (teammateInput.trim() !== "") {
+                teammates = teammateInput.split(',').map(id => id.trim());
+            }
 
-            console.log("Teammates:", teammates);
+            console.log("Teammates:", teammates);
 
-            // Step 4: Send registration data to backend
-            const response = await fetch("/api/events/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                // The backend expects 'teammates' and handles the primary user separately
-                body: JSON.stringify({ eventId, teammates })
-            });
+            // Step 4: Send registration data to backend
+            const response = await fetch("/api/events/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                // The backend expects 'teammates' and handles the primary user separately
+                body: JSON.stringify({ eventId, teammates })
+            });
 
-            console.log("Response received:", response.status);
+            console.log("Response received:", response.status);
 
-            if (response.status === 401) {
-                window.location.href = "/login.html";
-                return;
-            }
+            if (response.status === 401) {
+                window.location.href = "/login.html";
+                return;
+            }
 
-            const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.error || "Unknown error");
-            }
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Unknown error");
+            }
 
-            // Step 5: Success flow
-            console.log("Registration successful:", result);
-            alert("Event registered successfully!");
-            localStorage.setItem("updateEvents", "true");
-            window.location.href = "/profile.html";
-        } catch (error) {
-            console.error("Error occurred:", error);
-            alert(error.message || "An error occurred. Please try again.");
-        }
-    }
+            // Step 5: Success flow
+            console.log("Registration successful:", result);
+            alert("Event registered successfully!");
+            localStorage.setItem("updateEvents", "true");
+            window.location.href = "/profile.html";
+        } catch (error) {
+            console.error("Error occurred:", error);
+            alert(error.message || "An error occurred. Please try again.");
+        }
+    }
 
-    // ✅ Profile Link Auth Check
-    document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-    document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+    // ✅ Profile Link Auth Check
+    document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+    document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
-    async function checkAuth(event) {
-        event.preventDefault();
+    async function checkAuth(event) {
+        event.preventDefault();
 
-        try {
-            const response = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
+        try {
+            const response = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
 
-            if (response.ok) {
-                window.location.href = "/profile.html";
-            } else {
-                alert("Login first!");
-                window.location.href = "/login.html";
-            }
-        } catch (error) {
-            console.error("Error checking authentication:", error);
-            alert("Login first!");
-            window.location.href = "/login.html";
-        }
-    }
+            if (response.ok) {
+                window.location.href = "/profile.html";
+            } else {
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        } catch (error) {
+            console.error("Error checking authentication:", error);
+            alert("Login first!");
+            window.location.href = "/login.html";
+        }
+    }
 
-    // ✅ Click logo to return to home
-    document.querySelector('.logo').addEventListener('click', function() {
-        window.location.href = 'index.html';
+    // ✅ Click logo to return to home
+    document.querySelector('.logo').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+
+     // Check if the user is already registered for this event
+    async function checkRegistrationStatus() {
+        const registerButton = document.querySelector('.register-button');
+        const eventId = 9; // Corrected Event ID for ClueCraze
+
+        try {
+            const userResponse = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                const userId = userData.userId;
+
+                // Check registration status via a new or existing API endpoint
+                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
+
+                if (registrationResponse.ok) {
+                    const registrationData = await registrationResponse.json();
+                    if (registrationData.isRegistered) {
+                        registerButton.disabled = true;
+                        registerButton.textContent = "ALREADY REGISTERED";
+                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
+                        registerButton.style.cursor = "not-allowed";
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error checking registration status:", error);
+        }
+    }
+
+    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
+    async function fetchSlotsRemaining() {
+        const eventId = 9; // ClueCraze's event ID
+        const totalSlots = 8; // Based on the rules for ClueCraze (teams of 4, so 2 teams)
+        const registerButton = document.querySelector('.register-button');
+
+        try {
+            const response = await fetch(`/api/events/slots-taken/${eventId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch slots data.');
+            }
+            const data = await response.json();
+            const slotsTaken = data.slotsTaken;
+            const remaining = totalSlots - slotsTaken;
+
+            document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
+
+            // ✅ NEW: Disable button if no slots are remaining
+            if (remaining <= 0) {
+                registerButton.disabled = true;
+                registerButton.textContent = "SLOTS FULL";
+                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
+                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
+            }
+        } catch (error) {
+            console.error("Error fetching slots:", error);
+            document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
+            registerButton.disabled = true;
+            registerButton.textContent = "UNAVAILABLE";
+            registerButton.style.backgroundColor = "#999";
+            registerButton.style.cursor = "not-allowed";
+        }
+    }
+
+    // Call the functions when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSlotsRemaining();
+        checkRegistrationStatus();
     });
 
-    // Check if the user is already registered for this event
-    async function checkRegistrationStatus() {
-        const registerButton = document.querySelector('.register-button');
-        const eventId = 8;
-
-        try {
-            const userResponse = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
-
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                const userId = userData.userId;
-
-                // Check registration status via a new or existing API endpoint
-                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
-
-                if (registrationResponse.ok) {
-                    const registrationData = await registrationResponse.json();
-                    if (registrationData.isRegistered) {
-                        registerButton.disabled = true;
-                        registerButton.textContent = "ALREADY REGISTERED";
-                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
-                        registerButton.style.cursor = "not-allowed";
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error checking registration status:", error);
-        }
-    }
-
-    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
-    async function fetchSlotsRemaining() {
-        const eventId = 9; // Query Quest's event ID
-        const totalSlots = 8; // Based on the rules for Query Quest (individual event)
-        const registerButton = document.querySelector('.register-button');
-
-        try {
-            const response = await fetch(`/api/events/slots-taken/${eventId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch slots data.');
-            }
-            const data = await response.json();
-            const slotsTaken = data.slotsTaken;
-            const remaining = totalSlots - slotsTaken;
-
-            document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
-
-            // ✅ NEW: Disable button if no slots are remaining
-            if (remaining <= 0) {
-                registerButton.disabled = true;
-                registerButton.textContent = "SLOTS FULL";
-                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
-                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
-            }
-        } catch (error) {
-            console.error("Error fetching slots:", error);
-            document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
-            registerButton.disabled = true;
-            registerButton.textContent = "UNAVAILABLE";
-            registerButton.style.backgroundColor = "#999";
-            registerButton.style.cursor = "not-allowed";
-        }
-    }
-
-    // Call the function when the page loads
-    document.addEventListener('DOMContentLoaded', fetchSlotsRemaining);
-
 </script>
-        <footer>
-            <p>&copy; 2025 CSEA. All rights reserved.</p>
-        </footer>
+        <footer>
+            <p>&copy; 2025 CSEA. All rights reserved.</p>
+        </footer>
 </body>
 </html>

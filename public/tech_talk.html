@@ -25,7 +25,6 @@
             <a href="login.html">Login</a>
         </nav>
         <div class="side-menu" id="sideMenu">
-            <!-- Example folder-based links -->
             <a href="index.html">Home</a>
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
@@ -65,8 +64,8 @@
                 </div>
             </div>
 
-           
- <button class="register-button" onclick="registerForEvent(1)" >REGISTER NOW</button>
+            
+<button class="register-button" onclick="registerForEvent(1)" >REGISTER NOW</button>
 
             </div>
         </div>
@@ -161,7 +160,7 @@
     // Check if the user is already registered for this event
     async function checkRegistrationStatus() {
         const registerButton = document.querySelector('.register-button');
-        const eventId = 8;
+        const eventId = 1; // Corrected Event ID for Paper Presentation
 
         try {
             const userResponse = await fetch("/api/user/check-auth", {
@@ -191,6 +190,12 @@
         }
     }
 
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        checkRegistrationStatus();
+    });
+
+
     // ✅ Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
     document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
@@ -216,8 +221,6 @@
             window.location.href = "/login.html";
         }
     }
-
-     
 
     // ✅ Click logo to return to home
     document.querySelector('.logo').addEventListener('click', function() {

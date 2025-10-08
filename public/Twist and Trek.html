@@ -183,7 +183,7 @@
             }
         } catch (error) {
             console.error("Error fetching slots:", error);
-            document.getElementById('slots-remaining').textContent = `(Error: Login to View Remaining Slots)`;
+            document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
             // Disable button if fetching failed (due to network/server error)
             registerButton.disabled = true;
             registerButton.textContent = "UNAVAILABLE";
@@ -192,16 +192,6 @@
         }
     }
     
-    
-
-
-    // Call the functions when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchSlotsRemaining();
-        checkRegistrationStatus();
-    });
-
-
     // Check if the user is already registered for this event
     async function checkRegistrationStatus() {
         const registerButton = document.querySelector('.register-button');
@@ -234,6 +224,13 @@
             console.error("Error checking registration status:", error);
         }
     }
+
+
+    // Call the functions when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSlotsRemaining();
+        checkRegistrationStatus();
+    });
 
     // Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
