@@ -184,6 +184,39 @@
         window.location.href = 'index.html';
     });
 
+    // Check if the user is already registered for this event
+    async function checkRegistrationStatus() {
+        const registerButton = document.querySelector('.register-button');
+        const eventId = 8;
+
+        try {
+            const userResponse = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                const userId = userData.userId;
+
+                // Check registration status via a new or existing API endpoint
+                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
+
+                if (registrationResponse.ok) {
+                    const registrationData = await registrationResponse.json();
+                    if (registrationData.isRegistered) {
+                        registerButton.disabled = true;
+                        registerButton.textContent = "ALREADY REGISTERED";
+                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
+                        registerButton.style.cursor = "not-allowed";
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error checking registration status:", error);
+        }
+    }
+
     // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
     async function fetchSlotsRemaining() {
         const eventId = 9; // Query Quest's event ID

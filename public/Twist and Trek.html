@@ -192,6 +192,16 @@
         }
     }
     
+    
+
+
+    // Call the functions when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSlotsRemaining();
+        checkRegistrationStatus();
+    });
+
+
     // Check if the user is already registered for this event
     async function checkRegistrationStatus() {
         const registerButton = document.querySelector('.register-button');
@@ -224,13 +234,6 @@
             console.error("Error checking registration status:", error);
         }
     }
-
-
-    // Call the functions when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchSlotsRemaining();
-        checkRegistrationStatus();
-    });
 
     // Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
