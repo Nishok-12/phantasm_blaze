@@ -4,6 +4,7 @@ import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
 const router = express.Router();
 import nodemailer from "nodemailer";
 
+// FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING (DOES NOT REQUIRE LOGIN)
 // Add this new route below the existing ones in events.js
 router.get("/slots-taken/:eventId", async (req, res) => {
     try {
@@ -19,14 +20,6 @@ router.get("/slots-taken/:eventId", async (req, res) => {
     }
 });
 
-// Function to check if a user is already registered for a specific event
-const isAlreadyRegistered = async (userId, eventId) => {
-    const [result] = await db.query(
-        "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
-        [userId, eventId]
-    );
-    return result.length > 0;
-};
 
 // Function to check if a user has a single pass and is already registered for an event
 const hasSinglePassRestriction = async (userId) => {
