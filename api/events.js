@@ -40,6 +40,28 @@ const hasSinglePassRestriction = async (userId) => {
 };
 
 
+// Function to check if a user is already registered for a specific event
+const isAlreadyRegistered = async (userId, eventId) => {
+    const [result] = await db.query(
+        "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
+        [userId, eventId]
+    );
+    return result.length > 0;
+};
+
+
+// New Public Route to check registration status
+router.get("/is-registered/:userId/:eventId", async (req, res) => {
+    try {
+        const { userId, eventId } = req.params;
+        const isRegistered = await isAlreadyRegistered(userId, eventId);
+        res.json({ isRegistered });
+    } catch (error) {
+        console.error("Error checking registration status:", error);
+        res.status(500).json({ error: "Failed to check registration status." });
+    }
+});
+
 router.post("/register", requireAuth, async (req, res) => {
     const { eventId, teammates = [] } = req.body;
     const userId = req.user?.userId;
