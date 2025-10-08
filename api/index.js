@@ -79,7 +79,7 @@ console.log("🔍 Checking Database Connection State:", db);
 
 // Serve index.html for root
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "blaze_pre.html"));
 });
 
 // Start server

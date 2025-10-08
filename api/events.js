@@ -192,10 +192,10 @@ const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
             <p><strong>Event Registered:</strong> ${event.name}</p>
             <p><strong>user ID:</strong> ${qrCodeId}</p>
 https://phantasm-blaze.onrender.com
-            <p>Got questions? Feel free to reach out at phantasm25cse@gmail.com. Stay updated by visiting https://phantasm.onrender.com</p>
+            <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
             <p>See you soon!</p>
             <p><strong>Best Regards,</strong></p>
-            <p>Phantasm'25 Team</p>
+            <p>Phantasm Blaze Team</p>
         `,
     };
 
