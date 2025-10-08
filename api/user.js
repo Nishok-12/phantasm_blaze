@@ -21,7 +21,7 @@ router.get("/check-auth", (req, res) => {
     });
 });
 
-// This route has been reverted to NOT include pass_type or transaction_id, as requested.
+// This route remains unchanged (does not include pass/transid update), as requested.
 router.post("/update-profile", requireAuth, async (req, res) => {
     try {
         // Destructure only the original fields
@@ -43,7 +43,7 @@ router.post("/update-profile", requireAuth, async (req, res) => {
         console.log(`🛠 SQL Query: UPDATE users SET name=?, college=?, year=?, accommodation=?, phone=? WHERE id=?`);
         console.log("📝 Values:", [name, college, year, accommodation, phone, userId]);
 
-        // Execute query - REVERTED to exclude pass_type and transaction_id
+        // Execute query
         const [results] = await db.execute(
             "UPDATE users SET name = ?, college = ?, year = ?, accommodation = ?, phone = ? WHERE id = ?",
             [name, college, year, accommodation, phone, userId]
@@ -62,7 +62,7 @@ router.post("/update-profile", requireAuth, async (req, res) => {
 });
 
 
-// Get User Profile Route - Now includes pass_type and transaction_id in the fetch query
+// Get User Profile Route - Now uses 'pass' and 'transid' from the table with aliases
 router.get("/get-profile", async (req, res, next) => {
     console.log("🚀 Route /get-profile has been called");
     next();
@@ -78,8 +78,9 @@ router.get("/get-profile", async (req, res, next) => {
         const userId = parseInt(req.user.userId, 10);
         console.log("🔍 Fetching profile for userId:", userId);
 
-        // SQL query updated to include pass_type and transaction_id
-        const sqlQuery = "SELECT id, name, college, year, accommodation, role, phone, qr_code_id, pass, transid FROM users WHERE id = ?";
+        // SQL query updated: using DB columns 'pass' and 'transid' and aliasing them
+        // to 'pass_type' and 'transaction_id' for consistency with the frontend.
+        const sqlQuery = "SELECT id, name, college, year, accommodation, role, phone, qr_code_id, pass AS pass_type, transid AS transaction_id FROM users WHERE id = ?";
         console.log(`🛠 Running SQL Query: ${sqlQuery} with userId = ${userId}`);
 
         // Execute query
@@ -111,7 +112,7 @@ router.get("/get-profile", async (req, res, next) => {
 
 
 
-// Route to get user profile information - Now includes pass_type and transaction_id in the response
+// Route to get user profile information - Now maps 'pass' and 'transid' to the response keys
 router.get('/profile', requireAuth, async (req, res) => {
     try {
         const userId = req.user.userId; // Retrieved from the JWT
@@ -122,15 +123,16 @@ router.get('/profile', requireAuth, async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Send user details as a response, including new fields
+        // Send user details as a response, using the correct DB column names ('pass' and 'transid')
+        // and mapping them to the expected response keys ('pass_type' and 'transaction_id').
         res.json({
             name: user[0].name,
             college: user[0].college,
             year: user[0].year,
             accommodation: user[0].accommodation,
             qr_code_id: user[0].qr_code_id,
-            pass_type: user[0].pass,
-            transaction_id: user[0].transid,
+            pass_type: user[0].pass, // Using DB column 'pass'
+            transaction_id: user[0].transid, // Using DB column 'transid'
         });
     } catch (err) {
         console.error('Error fetching profile:', err);
