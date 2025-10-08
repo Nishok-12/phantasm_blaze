@@ -1,9 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Caudex&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+
 body {
-    background-image: url('bg.jpg');
+    background-image: url('schbg.jpeg');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: 100% 100%;
-    font-family: Arial, sans-serif;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     margin: 0;
     padding: 0;
     text-decoration: none;
@@ -21,7 +26,7 @@ body {
   
     header, footer {
       position: relative;
-      background: url('1.jpg') no-repeat center center / cover;
+      background: transparent;
       color: white;
       display: flex;
       justify-content: space-between;
@@ -31,7 +36,7 @@ body {
   }
 
   header {
-    padding: 0 20px;
+    padding: 0 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 1;
@@ -57,7 +62,7 @@ header nav a {
   transition: color 0.3s;
 }
 header nav a:hover {
-  color: #059ad2;
+  color: #cc3b6e;
 }
 
 .hamburger {
@@ -98,7 +103,7 @@ header nav a:hover {
 }
 
 .side-menu a:hover {
-  color: #f0a500;
+  color: #cc3b6e;
 }
 
 .side-menu.open {
@@ -123,7 +128,7 @@ footer p {
 }
 
 footer a {
-  color: #059AD2;
+  color: #cc3b6e;
   text-decoration: none;
 }
 
@@ -199,7 +204,7 @@ footer a:hover {
       right: -100%;
       width: 250px;
       height: 100vh;
-      background: url('1.jpg') no-repeat center center / cover;
+      background: url('schbg.jpeg') no-repeat center center / cover;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -292,7 +297,7 @@ footer a:hover {
 .popup-boxb h3, 
 .popup-boxc h3 {
   color: #f8f8f8;
-  font-size: 1.3em;
+  font-size: 1.2em;
   letter-spacing: 1px;
   text-decoration: none !important; /* Ensures underline is removed */
 }

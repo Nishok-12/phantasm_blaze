@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" href="gceblogo.png" type="image/x-icon">
-    <title>Schedule</title>
+      <link rel="icon" href="logo.png" type="image/x-icon">
+    <title>Shedule</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Caudex&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: url('bg.jpg') no-repeat center center / cover;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
+            background: url('schbg.jpeg') no-repeat center center / cover;
+            background-size: 100% 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -22,7 +26,7 @@
 
         header, footer {
         position: relative;
-        background: url('1.jpg') no-repeat center center / cover;
+        background: transparent;
         color: white;
         display: flex;
         justify-content: space-between;
@@ -33,8 +37,8 @@
 
 
     header {
-        font-family: 'Caudex', serif;
-        padding: 0 20px;
+
+        padding: 0 30px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         position: relative;
         z-index: 1;
@@ -42,6 +46,9 @@
 
 
     header .logo {
+        font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
         font-size: 1.5em;
         font-weight: bold;
         z-index: 2;
@@ -85,7 +92,7 @@
     
     .close-icon {
         display: none;
-        position: fixed;
+        position: relative;
         top: 15px;
         right: 15px;
         cursor: pointer;
@@ -110,11 +117,13 @@
 
 
     header nav a:hover {
-        color: #059AD2;
+        color: #cc3b6e;
     }
 
     footer {
-        font-family: 'Caudex', serif;
+        font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
         position: fixed;
         bottom: 0;
         width: 100%;
@@ -133,7 +142,7 @@
     }
 
     footer a {
-        color: #059AD2;
+        color: #cc3b6e;
         text-decoration: none;
     }
 
@@ -172,7 +181,7 @@
     right: -100%;
     width: 250px;
     height: 100vh;
-    background: url('1.jpg') no-repeat center center / cover;
+    background: url('schbg.jpeg') no-repeat center center / cover;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -216,7 +225,7 @@
     margin: 50px 100px;
     border-collapse: collapse;
     background: transparent; /* Fully transparent background */
-    box-shadow: 0px 0px 20px rgba(0, 191, 255, 0.5); /* Neon glow */
+    box-shadow: 0px 0px 20px rgba(197, 48, 48, 0.5); /* Neon glow */
     border-radius: 12px;
     overflow: hidden;
     backdrop-filter: blur(10px); /* Adds a subtle glass effect */
@@ -225,13 +234,13 @@
 
         .tab th, .tab td {
             padding: 12px;
-            border: 1px solid rgba(0, 191, 255, 0.4);
+            border: 1px solid rgba(149, 39, 68, 0.4);
             text-align: center;
             position: relative;
         }
 
         .tab th {
-            background: linear-gradient(90deg, #004488, #0088cc);
+            background: linear-gradient(90deg, #aa6044, #954325);
             color: #fff;
             text-transform: uppercase;
             font-size: 17px;
@@ -240,7 +249,7 @@
 
         .tab td {
             background: rgba(0, 0, 0, 0.6);
-            color: #00bfff;
+            color: #ae373f;
             font-size: 15px;
             transition: all 0.4s ease-in-out;
         }
@@ -251,9 +260,9 @@
         }
 
         .tab tr:hover {
-            background: rgba(0, 191, 255, 0.3); /* Light neon blue tint */
-            box-shadow: 0px 0px 15px rgba(0, 191, 255, 0.7), 
-                        0px 0px 25px rgba(0, 191, 255, 0.5); /* Outer glow */
+            background: rgba(146, 158, 50, 0.3); /* Light neon blue tint */
+            box-shadow: 0px 0px 15px rgba(149, 40, 42, 0.7), 
+                        0px 0px 25px rgba(163, 67, 118, 0.5); /* Outer glow */
             border-radius: 6px; /* Slightly round the edges */
             transition: all 0.3s ease-in-out;
         }
@@ -279,7 +288,7 @@
     }
 
     .tab tr:hover {
-        background: rgba(0, 191, 255, 0.2);
+        background: rgba(173, 59, 67, 0.581);
         box-shadow: none; /* No extra glow for better visibility */
         transform: none; /* Prevent pop-out effect on mobile */
     }
@@ -317,7 +326,7 @@
 </script>
 
     <header>
-        <div class="logo">Phantasm'25</div>
+        <div class="logo">Phantasm Blaze</div>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()">
             <div></div>
             <div></div>
@@ -329,7 +338,7 @@
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
             <a href="contact-us.html">Contact</a>
-<a href="#" id="profileLinkDesktop">Profile</a>
+            <a href="profile.html" id="profileLinkDesktop">Profile</a>
             <a href="login.html">Login</a>
         </nav>
         <div class="side-menu" id="sideMenu">
@@ -353,73 +362,81 @@
         <th>Time</th>
      </tr>
      <tr>
-        <td>TechTalk 2.0</td>
+        <td>TechTalk</td>
         <td>Technical</td>
-        <td>Seminar Hall</td>
-        <td>18.03.2025</td>
-        <td>10 AM to 1 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
      <tr>
-        <td>Tech Tornado</td>
+        <td>CodeCipher</td>
         <td>Technical</td>
-        <td>Project Lab</td>
-        <td>18.03.2025</td>
-        <td>10 AM to 11 AM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
      <tr>
-        <td>Query Quest</td>
+        <td>QueryQuest</td>
         <td>Technical</td>
-        <td>Cloud Laboratary</td>
-        <td>18.03.2025</td>
-        <td>11 AM to 12 AM</td>
-     </tr>
-
-     <tr>
-        <td>Creative Blueprint</td>
-        <td>Technical</td>
-        <td>OpenSource Laboratary</td>
-        <td>18.03.2025</td>
-        <td>12 AM to 1 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
 
      <tr>
-        <td>IPL Auction</td>
+        <td>GenSight</td>
+        <td>Technical</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
+     </tr>
+
+     <tr>
+        <td>CodeVortex</td>
+        <td>Technical</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
+     </tr>
+
+     <tr>
+        <td>PowerPicks</td>
         <td>Non-Technical</td>
-        <td>Second Year Classroom (CS-112)</td>
-        <td>18.03.2025</td>
-        <td>1.30 PM to 5 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
 
      <tr>
-        <td>Mystic Adventure</td>
+        <td>Twist and Trek</td>
         <td>Non-Technical</td>
-        <td>Seminar Hall</td>
-        <td>18.03.2025</td>
-        <td>2 PM to 3 PM</td>
-     </tr>
-
-     <tr>
-        <td>3X Battle</td>
-        <td>Non-Technical</td>
-        <td>Seminar Hall</td>
-        <td>18.03.2025</td>
-        <td>3 PM to 4 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
 
      <tr>
         <td>Free Fire</td>
         <td>Non-Technical</td>
-        <td>Third Year Classroom (CS-107)</td>
-        <td>18.03.2025</td>
-        <td>4 PM to 5 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
 
-  <tr>
+     <tr>
         <td>PUBG</td>
         <td>Non-Technical</td>
-        <td>Final year Classroom (CS-106)</td>
-        <td>18.03.2025</td>
-        <td>4 PM to 5 PM</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
+     </tr>
+
+     <tr>
+        <td>ClueCraze</td>
+        <td>Non-Technical</td>
+        <td>To be Announced</td>
+        <td>30.10.2025</td>
+        <td>To be Announced</td>
      </tr>
 
     </table>
@@ -430,7 +447,7 @@
     <p></p>
     <script>
         document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+        document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
 async function checkAuth(event) {
     event.preventDefault();

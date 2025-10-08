@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="logo.png" type="image/x-icon">
+    <title>Pubg or FreeFire</title>
+    <link rel="stylesheet" href="nontech.css">
+</head>
+<body>
+    <header>
+        <div class="logo">Phantasm Blaze</div>
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+<a href="#" id="profileLinkDesktop">Profile</a>
+            <a href="login.html">Login</a>
+        </nav>
+        <div class="side-menu" id="sideMenu">
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+<a href="#" id="profileLinkMobile">Profile</a>
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <div class="container">
+ 
+        <div class="content">
+            <div class="event-title">Pubg or FreeFire <span id="slots-remaining"></span></div>
+            <div class="warning-message">Note: Kindly refer the schedule before registering events</div>
+            <div class="event-section">
+                <div class="box description-box">
+                    <div class="ed">
+                        <div class="front">DESCRIPTION</div>
+                        <div class="back">
+                            <p>Players will enter a battle royale-style competition in Free Fire and PUBG. The objective is to survive till the end by eliminating opponents. The last team standing is the winner.!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="box rules-box">
+                    <div class="ed">
+                        <div class="front">RULES</div>
+                            <div class="back">
+                                <ol type="A">
+                                    <li>Each team consist of 4 members.</li>
+                                    <li>Each match follows standard battle royale rules.</li>
+                                    <li>Players must loot, strategize, and eliminate opponents.</li>
+                                    <li>No external hacks, scripts, or unfair advantages.</li>
+                                    <li>The last surviving team in the match is declared the winner.</li>
+                                    <li>No teaming up with other teams.</li>
+                                    <li>Organizers will decide the maps, and other settings.</li>
+                                </ol>
+                            </div>
+                            </div>
+                </div>
+            </div>
+ <button class="register-button" onclick="registerForEvent(6)" >REGISTER NOW</button>
+            </div>
+        </div>
+        </div>   
+    </div>
+    <script>
+    // Function to toggle the side menu
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const hamburger = document.getElementById('hamburger');
+        const closeIcon = document.getElementById('closeIcon');
+
+        sideMenu.classList.toggle('open');
+
+        if (sideMenu.classList.contains('open')) {
+            hamburger.style.display = 'none';
+            closeIcon.style.display = 'block';
+        } else {
+            hamburger.style.display = 'flex';
+            closeIcon.style.display = 'none';
+        }
+    }
+
+    // ✅ Modified Event Registration Function
+    async function registerForEvent(eventId) {
+        console.log("Starting event registration...");
+
+        try {
+            // Step 1: Get current logged-in user info
+            const userResponse = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!userResponse.ok) {
+                alert("Please log in first!");
+                window.location.href = "/login.html";
+                return;
+            }
+
+            const userData = await userResponse.json();
+            const userId = userData.userId; // Ensure your backend returns this field
+            console.log("Current User ID:", userId);
+
+            // Step 2: Prompt for teammate IDs
+            const teammateInput = prompt("Enter your teammate(s) User ID(s) separated by commas (e.g., PSM_102, PSM_103, PSM_104):", "");
+            if (teammateInput === null) {
+                alert("Registration cancelled.");
+                return;
+            }
+            
+            // Step 3: Parse and build the 'teammates' array
+            let teammates = [];
+            if (teammateInput.trim() !== "") {
+                teammates = teammateInput.split(',').map(id => id.trim());
+            }
+
+            console.log("Teammates:", teammates);
+
+            // Step 4: Send registration data to backend
+            const response = await fetch("/api/events/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                // The backend expects 'teammates' and handles the primary user separately
+                body: JSON.stringify({ eventId, teammates })
+            });
+
+            console.log("Response received:", response.status);
+
+            if (response.status === 401) {
+                window.location.href = "/login.html";
+                return;
+            }
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Unknown error");
+            }
+
+            // Step 5: Success flow
+            console.log("Registration successful:", result);
+            alert("Event registered successfully!");
+            localStorage.setItem("updateEvents", "true");
+            window.location.href = "/profile.html";
+        } catch (error) {
+            console.error("Error occurred:", error);
+            alert(error.message || "An error occurred. Please try again.");
+        }
+    }
+
+    // ✅ Profile Link Auth Check
+    document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+    document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+
+    async function checkAuth(event) {
+        event.preventDefault();
+
+        try {
+            const response = await fetch("/api/user/check-auth", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                window.location.href = "/profile.html";
+            } else {
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        } catch (error) {
+            console.error("Error checking authentication:", error);
+            alert("Login first!");
+            window.location.href = "/login.html";
+        }
+    }
+
+    // ✅ Click logo to return to home
+    document.querySelector('.logo').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+
+    </script>
+        <footer>
+            <p>&copy; 2025 CSEA. All rights reserved.</p>
+        </footer>
+</body>
+</html>

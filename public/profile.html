@@ -7,29 +7,36 @@
       <link rel="icon" href="gceblogo.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
             color: #333;
-            background: url(bg.jpg);
+            background: url(schbg.jpeg);
               background-attachment:fixed;
         }
 
         .container {
-    background: rgba(255, 255, 255, 0.1);
+    background:rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 30px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 100%;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     text-align: center;
     transform: translateY(20px);
     animation: fadeIn 2s forwards, glowing-border 3s infinite alternate, moving-border 2s linear infinite;
     border: 5px solid transparent;
-    border-image: linear-gradient(0deg, #000000, #366fb0, #000000, #437da8);
+    border-image: linear-gradient(270deg, #ff6a00, #ffb703, #ffd166, #06d6a0, #118ab2);
     border-image-slice: 1;
     justify-self: center;
     margin-top: 5%;
@@ -39,32 +46,16 @@
 }
 /* Blue & Black Glowing Border Animation */
 
-@keyframes glowing-border {
-
-0% {
-
-  border-color: rgba(0, 0, 0, 0.5);
-
-  box-shadow: 0 0 10px rgba(60, 143, 231, 0.3);
-
-}
-
-50% {
-
-  border-color: rgba(76, 139, 233, 0.6);
-
-  box-shadow: 0 0 25px rgba(77, 174, 223, 0.6);
-
-}
-
-100% {
-
-  border-color: rgba(0, 0, 0, 1);
-
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
-
-}
-
+@keyframes borderFlow {
+  0% {
+    border-image-source: linear-gradient(270deg, #ff6a00, #ffb703, #ffd166, #06d6a0, #118ab2);
+  }
+  50% {
+    border-image-source: linear-gradient(270deg, #118ab2, #06d6a0, #ffd166, #ffb703, #ff6a00);
+  }
+  100% {
+    border-image-source: linear-gradient(270deg, #ff6a00, #ffb703, #ffd166, #06d6a0, #118ab2);
+  }
 }
 
 
@@ -72,38 +63,24 @@
 /* Moving Border Animation (Blue & Black) */
 
 @keyframes moving-border {
-
-0% {
-
-  border-image-source: linear-gradient(0deg, #000000, #3e749d, #000000, #3877a7);
-
+  0% {
+    border-image-source: linear-gradient(0deg, #000000, #ff3b3b, #ff6a00, #ffb703);
+  }
+  25% {
+    border-image-source: linear-gradient(90deg, #000000, #ff6a00, #ffb703, #ffd166);
+  }
+  50% {
+    border-image-source: linear-gradient(180deg, #000000, #ff4e11, #ffb703, #fcbf49);
+  }
+  75% {
+    border-image-source: linear-gradient(270deg, #000000, #ff3b3b, #ff9f1c, #ffd166);
+  }
+  100% {
+    border-image-source: linear-gradient(360deg, #000000, #ff3b3b, #ff6a00, #ffb703);
+  }
 }
 
-25% {
 
-  border-image-source: linear-gradient(90deg, #000000, #5379eb, #000000, #286197);
-
-}
-
-50% {
-
-  border-image-source: linear-gradient(180deg, #000000, #3e7ab1, #000000, #357ca8);
-
-}
-
-75% {
-
-  border-image-source: linear-gradient(270deg, #000000, #589af7, #000000, #37727f);
-
-}
-
-100% {
-
-  border-image-source: linear-gradient(360deg, #000000, #4881b0, #000000, #59a6e5);
-
-}
-
-}
 
 
 /* Fade-in animation */
@@ -121,20 +98,6 @@ to {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -143,6 +106,11 @@ to {
         .header h1 {
             font-size: 2.5em;
             margin: 0;
+            background: linear-gradient(135deg, #ff9800, #ff5722, #ff6f00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 87, 34, 0.5);
         }
 
         .profile-info, .edit-profile {
@@ -152,11 +120,28 @@ to {
         .profile-info .profile-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 87, 34, 0.2);
+            transition: all 0.3s ease;
+            color:#ff9800;
         }
 
-        .profile-item:last-child {
-            border-bottom: none;
+        .profile-item:hover {
+            background: rgba(255, 87, 34, 0.05);
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 8px;
+            border-bottom-color: rgba(255, 87, 34, 0.4);
+        }
+
+        .profile-item span:first-child {
+            color: #ff9800; /* Label color (like "Name:") */
+            font-weight: 600;
+            }
+
+        .profile-item span:last-child {
+            color: #ffccbc; /* Value color (like "John Doe") */
+            font-weight: 500;
         }
 
         .edit-profile {
@@ -165,33 +150,92 @@ to {
             gap: 15px;
         }
 
+        .edit-profile label {
+            color: #ff9800;
+            text-align: left;
+            font-weight: 500;
+        }
+
+
         .buttons {
             margin-top: 20px;
             display: flex;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
             justify-content: space-between;
         }
 
+        .edit-profile input,
+        .edit-profile select {
+            background: rgba(255, 87, 34, 0.1);
+            border: 1px solid rgba(255, 87, 34, 0.3);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile input:focus,
+        .edit-profile select:focus {
+            outline: none;
+            border-color: #ff5722;
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.3);
+            background: rgba(255, 87, 34, 0.15);
+        }
+
         .buttons button {
-            background: #007bff;
+            background: linear-gradient(135deg, #ff5722, #ff6f00);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
             cursor: pointer;
             font-size: 1em;
-            transition: background 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buttons button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .buttons button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .buttons button:hover {
-            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 87, 34, 0.5);
+        }
+
+        .buttons button:active {
+            transform: translateY(0);
         }
 
         .buttons .logout {
-            background: #dc3545;
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
         }
 
         .buttons .logout:hover {
-            background: #a71d2a;
+            box-shadow: 0 6px 25px rgba(211, 47, 47, 0.5);
         }
 
         .events-section {
@@ -203,15 +247,15 @@ to {
         }
 
         .event-card {
-border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #000;
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #000;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
         }
 
         .event-card h3 {
@@ -272,7 +316,7 @@ border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     header nav a:hover {
-        color:#059AD2;
+        color:#CC3B62;
     }
 
     .hamburger {
@@ -517,7 +561,7 @@ border: 1px solid rgba(255, 255, 255, 0.3);
 <body>
 
     <header>
-        <div class="logo">Phantasm'25</div>
+        <div class="logo">Phantasm Blaze</div>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()">
             <div></div>
             <div></div>
@@ -600,13 +644,25 @@ border: 1px solid rgba(255, 255, 255, 0.3);
                     <span id="profile-year">3</span>
                 </div>
                 <div class="profile-item">
-                    <span>Accommodation:</span>
-                    <span id="profile-accommodation">Yes</span>
+                <span>Accommodation:</span>
+                <span id="profile-accommodation">Yes</span>
                 </div>
+
                 <div class="profile-item">
-    <span>Phone:</span>
-    <span id="profile-phone">Not available</span>
-</div>
+                <span>Pass Type:</span>
+                <span id="profile-pass-type">N/A</span>
+                </div>
+
+                <div class="profile-item">
+                <span>Transcation ID:</span>
+                <span id="profile-Trans-id">N/A</span>
+                </div>
+                
+                <div class="profile-item">
+                <span>Phone:</span>
+                <span id="profile-phone">Not available</span>
+                </div>
+
 
             </div>
 
@@ -725,6 +781,9 @@ function fetchUserProfile() {
         document.getElementById("profile-year").textContent = data.year || "N/A";
         document.getElementById("profile-accommodation").textContent = data.accommodation || "No info";
         document.getElementById("profile-phone").textContent = data.phone || "Not available";
+
+        document.getElementById("profile-pass-type").textContent = data.pass_type || "N/A";
+        document.getElementById("profile-Trans-id").textContent = data.transaction_id || "N/A";
 
         document.getElementById("name").value = data.name || "";
         document.getElementById("college").value = data.college || "";

@@ -139,12 +139,12 @@ router.post("/register", async (req, res) => {
 
         // Check if the user already exists by email or registration number
         const [existingUser] = await db.query(
-            "SELECT id FROM users WHERE email = ? OR reg_no = ?",
-            [email, reg_no]
+            "SELECT id FROM users WHERE email = ?",
+            [email]
         );
 
         if (existingUser.length > 0) {
-            return res.status(409).json({ error: "User with this email or registration number already exists." });
+            return res.status(409).json({ error: "User with this email already exists." });
         }
 
         // The query needs to be updated to include `transid` and `Pass`
@@ -153,6 +153,7 @@ router.post("/register", async (req, res) => {
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [name, college, department, reg_no, year, phone, email, hashedPassword, accommodation, role, transid, Pass]
         );
+
 
 
         const userId = result.insertId;

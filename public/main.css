@@ -1,0 +1,407 @@
+@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+
+/* -------------------- Global Styles -------------------- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
+    background: url('schbg.jpeg') no-repeat center center / cover;
+    color: #fff;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* -------------------- Header & Footer Positioning -------------------- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: transparent;
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 1em 2em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+    /* Make the footer transparent and a regular block element */
+    background: transparent;
+    position: relative;
+    font-family: 'Caudex', serif;
+    width: 100%;
+    color: white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    flex-shrink: 0;
+}
+
+/* Main content wrapper to prevent content from being hidden under the fixed header */
+.main-content {
+    flex-grow: 1;
+    padding-top: 100px;
+}
+
+/* -------------------- Header & Navigation -------------------- */
+header .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    margin-right: auto;
+}
+
+header nav {
+    display: flex;
+    gap: 15px;
+    z-index: 2;
+    padding-right: 30px;
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+header nav a:hover {
+    color: #cc3b6e;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    z-index: 3;
+    padding: 10px;
+}
+
+.hamburger div {
+    width: 25px;
+    height: 3px;
+    background: white;
+    margin: 4px 0;
+    transition: all 0.3s;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.close-icon {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    z-index: 3;
+    font-size: 2em;
+    color: white;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 250px;
+    height: 100vh;
+    background: url('schbg.jpeg') no-repeat center center / cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 2;
+    transition: right 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.side-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
+.side-menu a:hover {
+    color: #f0a500;
+}
+
+.side-menu.open {
+    right: 0;
+}
+
+/* -------------------- Footer -------------------- */
+footer p {
+    margin: 5px 0;
+    z-index: 10;
+    font-size: 0.9em;
+}
+
+footer a {
+    color: #cc3b6e;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* -------------------- Media Queries for Mobile -------------------- */
+@media (max-width: 768px) {
+    header nav {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+    
+    .event-card {
+        width: 220px;
+        height: 130px;
+    }
+
+    h2 {
+        margin-left: 25px;
+        font-size: 1.4rem;
+    }
+    
+    .side-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 250px;
+        height: 100vh;
+        background: url('schbg.jpeg') no-repeat center center / cover;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        z-index: 2;
+        transition: right 0.3s ease-in-out;
+        overflow: hidden;
+    }
+
+    .side-menu.open {
+        right: 0;
+    }
+
+    #hamburger {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .side-menu,
+    .close-icon,
+    #hamburger {
+        display: none !important;
+    }
+}
+
+/* -------------------- General styles (applies to all screen sizes unless overridden) -------------------- */
+h2 {
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin: 40px 0 15px 50px;
+    background: linear-gradient(90deg, #ffb300, #ff6f00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+h2::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #ffb300, #ff6f00);
+    border-radius: 2px;
+    margin-top: 6px;
+}
+
+.container {
+    width: 100%;
+    padding-bottom: 60px;
+}
+
+/* -------------------- Slider Layout -------------------- */
+.slider-section {
+    position: relative;
+    margin-bottom: 60px;
+}
+
+.events-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 25px;
+    padding: 20px 50px;
+}
+
+.events-slider::-webkit-scrollbar {
+    display: flex;
+}
+
+/* -------------------- Event Card -------------------- */
+.event-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 300px;
+    height: 180px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.event-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    filter: brightness(80%);
+    transition: transform 0.6s ease, filter 0.5s ease;
+}
+
+/* -------------------- Hover Effects -------------------- */
+.event-card:hover {
+    transform: scale(1.08) rotateY(8deg);
+    box-shadow: 0 0 30px rgba(255, 170, 0, 0.4), 0 0 60px rgba(255, 94, 0, 0.2);
+    z-index: 10;
+}
+
+.event-card:hover img {
+    transform: scale(1.15);
+    filter: brightness(100%);
+}
+
+.event-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 165, 0, 0.15), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.event-card:hover::before {
+    opacity: 1;
+    animation: glowMove 3s linear infinite;
+}
+
+@keyframes glowMove {
+    0% {
+        transform: translate(-30%, -30%);
+    }
+
+    50% {
+        transform: translate(30%, 30%);
+    }
+
+    100% {
+        transform: translate(-30%, -30%);
+    }
+}
+
+/* -------------------- Overlay Text -------------------- */
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
+    color: #fff;
+    padding: 18px;
+    text-align: center;
+    transition: 0.4s ease;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.overlay h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #ffb300;
+    transition: transform 0.4s ease;
+}
+
+/* Hide the description initially */
+.overlay p {
+    font-size: 0.85rem;
+    color: #ddd;
+    margin-top: 6px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.4s ease, max-height 0.4s ease;
+}
+
+/* Show description when hovered */
+.event-card:hover .overlay p {
+    opacity: 1;
+    max-height: 60px;
+}
+
+.event-card:hover .overlay h3 {
+    text-shadow: 0 0 10px #ffb300;
+}
+
+/* -------------------- Navigation Arrows -------------------- */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 165, 0, 0.85);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    z-index: 20;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
+}
+
+.nav-btn:hover {
+    background: linear-gradient(135deg, #ffcc33, #ff8c00);
+    transform: scale(1.1);
+}
+
+.nav-btn.left {
+    left: 15px;
+}
+
+.nav-btn.right {
+    right: 15px;
+}

@@ -1,0 +1,224 @@
+/* -------------------------------
+   BODY (First CSS)
+--------------------------------*/
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+    background-image: url('schbg.jpeg');
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.wrapper {
+  flex: 1;
+}
+
+/* -------------------------------
+   HEADER & FOOTER (Second CSS)
+--------------------------------*/
+header, footer {
+  background: transparent;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  padding: 0 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+header .logo {
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+header nav {
+  display: flex;
+  gap: 15px;
+}
+
+header nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1em;
+  transition: color 0.3s;
+}
+
+header nav a:hover {
+  color: #cc3b6e;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 3;
+  padding: 10px;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 4px 0;
+  transition: all 0.3s;
+}
+
+/* Close Icon */
+.close-icon {
+  display: none;
+  font-size: 2em;
+  color: white;
+  cursor: pointer;
+  z-index: 3;
+}
+
+/* Side Menu (Mobile) */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 250px;
+  height: 100vh;
+  background: url('schbg.jpeg') no-repeat center center / cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  z-index: 2;
+  transition: right 0.3s ease-in-out;
+}
+
+.side-menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+  transition: color 0.3s;
+}
+
+.side-menu a:hover {
+  color: #cc3b6e;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+/* Footer */
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+footer p {
+  font-size: 0.9em;
+  margin: 0;
+}
+
+/* -------------------------------
+   EVENT SECTION
+--------------------------------*/
+.event-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px 60px;
+  background: url('schbg.jpeg') no-repeat center center / cover;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.event-details {
+  flex: 1;
+  min-width: 280px;
+  max-width: 600px;
+}
+
+.event-details h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.event-details h2 {
+  color: #cc3b6e;
+  margin-top: 20px;
+}
+
+.event-details p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #ddd;
+  margin-bottom: 15px;
+}
+
+.event-details h3 {
+  font-weight: normal;
+  font-size: 16px;
+  color: #ccc;
+  margin: 6px 0;
+}
+
+.event-image {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  justify-content: center;
+}
+
+.event-image img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* -------------------------------
+   RESPONSIVE DESIGN
+--------------------------------*/
+@media (max-width: 768px) {
+  header nav {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .close-icon {
+    display: none;
+  }
+
+  .event-section {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .event-details h1 {
+    font-size: 32px;
+  }
+
+  .event-details p, .event-details h3 {
+    font-size: 15px;
+  }
+
+  .event-image img {
+    width: 90%;
+    max-width: 350px;
+  }
+}

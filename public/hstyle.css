@@ -1,0 +1,927 @@
+/* ===================================== */
+/* 1. GLOBAL STYLES & BACKGROUND         */
+/* ===================================== */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+body {
+  font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  background: url('image/bg.png') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  min-height: 100vh; 
+  overflow-x: hidden; /* Prevent horizontal scroll due to animations/absolute elements */
+}
+
+/* Dark overlay for readability */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75); /* Slightly darker overlay */
+  z-index: -1;
+}
+
+/* FIRE PARTICLE CANVAS FIX: Positioned absolutely to cover the entire scrollable document */
+#fireCanvas {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* Will be set accurately by JS based on scrollHeight */
+  pointer-events: none; /* Allows clicks to pass through */
+  z-index: 99; /* Below navigation, above main content */
+}
+
+/* ALIGN CONTENT FIX: Centering for main content container */
+main {
+    display: block;
+    /*width: 90%;  Maintain a contained width */
+    /*max-width: 1200px;  Max width for large screens */
+    /*margin: 0 auto;  Center main content */
+}
+
+/* ===================================== */
+/* 2. HEADER & NAVIGATION                */
+/* ===================================== */
+
+/* Corrected primary header selector to match HTML structure */
+.hero-section > header {
+    position: relative; /* Changed from fixed/absolute to relative for normal flow */
+    background: transparent;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100px;
+    overflow: hidden;
+    padding: 0 30px;
+    color: #ff4500;
+    text-shadow: 2px 2px 8px rgba(255, 69, 0, 0.8);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 100; /* Ensure header is above fire canvas */
+}
+
+
+.hero-section .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    z-index: 102; /* Above nav and side-menu */
+}
+
+.hero-section nav {
+  display: flex;
+  gap: 15px;
+  z-index: 102;
+}
+
+.hero-section nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1em;
+  transition: color 0.3s;
+}
+.hero-section nav a:hover {
+  color: #cc3b6e;
+}
+
+/* Hamburger Icon Styling */
+.hamburger {
+  display: none;  /* Hidden by default on desktop */
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 103; /* Highest z-index to be clickable */
+  padding: 10px;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 4px 0;
+  transition: all 0.3s;
+}
+
+/* Close Icon for Side Menu */
+.close-icon {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  z-index: 202; /* Above side menu */
+  font-size: 2em;
+  color: white;
+}
+
+/* Side Menu Container */
+.side-menu {
+  /* Desktop: hidden via media query */
+  /* Mobile default: off-screen */
+  position: fixed;
+  top: 0;
+  right: -250px; /* Start off-screen */
+  width: 250px;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9); /* Dark background for side menu */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 201; /* Above header, below close icon */
+  transition: right 0.3s ease-in-out;
+  overflow-y: auto; /* Allow scrolling if needed */
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.side-menu.open {
+  right: 0; /* Slide in */
+}
+
+.side-menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  width: 100%;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.side-menu a:hover {
+  color: #cc3b6e;
+  background: rgba(255, 69, 0, 0.1);
+}
+
+/* Redundant/unused styles removed for cleaner code */
+/* .hidden { display: none !important; } */
+/* .top-left, .top-nav, .top-nav a, .top-nav .login-btn are now redundant due to the new header structure */
+
+/* --- FOOTER STYLES (No changes needed for nav) --- */
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+footer p {
+  margin: 15px 0;
+  font-size: 0.9em;
+}
+
+footer a {
+  color: #cc3b6e;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===================================== */
+/* 2.1 MEDIA QUERIES FOR NAVIGATION      */
+/* ===================================== */
+
+@media (max-width: 768px) {
+  /* Show hamburger and close desktop nav */
+  .hero-section nav {
+      display: none;
+  }
+
+  .hamburger {
+      display: flex; /* Show hamburger only on mobile view */
+  }
+  
+  /* Show close icon when menu is open (requires JS to toggle display) */
+  .side-menu.open + .close-icon {
+      display: block; 
+  }
+
+  /* Footer Responsiveness (Moved from section 9 to consolidate) */
+  .fire-footer { padding: 30px 15px; }
+  .footer-nav { margin-bottom: 30px; }
+  .footer-nav a { margin: 0 10px; font-size: 0.9rem; }
+  
+  .footer-content-clean {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 15px;
+  }
+  
+  .footer-logo { margin-bottom: 15px; text-align: center; }
+  .footer-message { margin-bottom: 15px; max-width: 90%; }
+  .footer-copyright-clean { text-align: center; }
+}
+
+@media (min-width: 769px) {
+  /* Hide hamburger, show desktop nav, hide side-menu */
+  .hamburger, .close-icon {
+      display: none !important;
+  }
+
+  .hero-section nav {
+      display: flex; /* Show normal navigation on desktop */
+  }
+  
+  .side-menu {
+      display: none !important;  /* Ensure side menu is hidden on desktop */
+      right: -250px !important; /* Keep it off-screen */
+  }
+}
+
+/* ===================================== */
+/* 3. HERO & HEADINGS                    */
+/* ===================================== */
+
+.hero-section {
+    padding-top: 0px;
+}
+
+.main-heading {
+  margin-top: 0;
+  font-size: 10rem;
+  font: unifrakturCook;
+  font-family: "UnifrakturCook", cursive;
+  font-weight: 700;
+  font-style: normal;
+  color: #fcebe6; 
+  text-shadow: 0 0 10px #ff4500;
+  animation: blaze-flicker 2s infinite alternate;
+}
+
+@keyframes blaze-flicker {
+  0%   { opacity: 1; text-shadow: 0 0 10px #ff4500; }
+  50%  { opacity: 0.8; text-shadow: 0 0 5px #ff6347; }
+  100% { opacity: 1; text-shadow: 0 0 10px #ff4500; }
+}
+
+.subtitle {
+  color: #ffd700;
+  font-size: 1.8rem;
+  margin-top: 10px;
+  text-shadow: 1px 1px 5px #ff4500;
+}
+
+/* ===================================== */
+/* 4. COUNTDOWN SECTION (Main Event)     */
+/* ===================================== */
+
+.countdown-section {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 30px 20px;
+  margin: 50px auto;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #ff4500;
+}
+
+.blaze-heading {
+  font-size: 2.5rem;
+  color: #ff4500; /* Bright Orange-Red */
+  margin-top: 25px;
+  margin-bottom: 20px;
+  display: inline-block;
+  
+  /* Black/Dark-Red Shadow for dramatic glow */
+  text-shadow: 
+    0 0 5px #ff0000, /* Core red glow */
+    0 0 10px #cc0000, /* Secondary dark red glow */
+    0 0 15px rgba(0, 0, 0, 0.8); /* Dark shadow for depth */
+    
+  animation: slow-flicker 3s infinite alternate;
+}
+
+@keyframes slow-flicker {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.tagline {
+  color: #ffd700;
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+
+.event-date-text {
+  font-size: 1.1rem;
+  margin: 15px 0;
+}
+
+/* Date/Time boxes */
+.date-time-box {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.time-item {
+  background: transparent;
+  padding: 15px 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ff4500;
+  font-size: 1.2rem;
+  flex-basis: 45%;
+  max-width: 250px;
+}
+
+.time-item span {
+  display: block;
+  margin-top: 5px;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+/* Countdown Grid */
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+#countdown .time-box {
+  background: transparent;
+  padding: 15px 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ff4500;
+  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#countdown .time-box span {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ff4500;
+  text-shadow: 0 0 5px #ffd700;
+  margin-bottom: 5px;
+}
+
+/* ===================================== */
+/* 5. ABOUT SECTION                      */
+/* ===================================== */
+
+.about-section {
+    padding-bottom: 50px;
+}
+
+/* UPDATED: Color matches .events-main-heading (Gold with glow) */
+.about-heading {
+  font-size: 2.5rem;
+  color: #ffd700; /* Gold */
+  margin-top: 40px;
+  margin-bottom: 30px;
+  
+  /* Gold/Red glow */
+  text-shadow: 
+    0 0 5px #ff4500,
+    0 0 15px rgba(255, 69, 0, 0.7);
+}
+
+.about-paragraph {
+  max-width: 900px;
+  margin: 0 auto 60px auto;
+  padding: 30px;
+  
+  /* Deeply transparent black background */
+  background: rgba(0, 0, 0, 0.7); 
+  
+  /* Red/Black Shadow and Border */
+  border: 2px solid #ff0000; /* Intense red border */
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.8), 0 0 30px rgba(0, 0, 0, 0.9);
+  color: #f0f0f0; 
+  font-size: 1.15rem;
+  line-height: 1.7;
+  text-align: justify;
+  text-shadow: 1px 1px 2px #000; 
+  backdrop-filter: blur(4px);
+}
+
+/* ===================================== */
+/* 6. EVENTS & REGISTRATION SECTION      */
+/* ===================================== */
+
+.events-section {
+    padding: 60px 20px;
+    margin-bottom: 50px;
+}
+
+.events-main-heading {
+    font-size: 2.8rem;
+    color: #ffd700; /* Gold heading */
+    margin-bottom: 50px;
+    text-shadow: 0 0 10px #ff4500;
+}
+
+.events-overview-heading {
+    margin-top: 80px;
+}
+
+.registration-table-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    border: 1px solid #ff8c00;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);
+}
+
+.reg-sub-heading {
+    font-size: 1.5rem;
+    color: #ff4500;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+.reg-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.reg-table th, .reg-table td {
+    padding: 15px 10px;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    color: #f0f0f0;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.reg-table th {
+    background: rgba(255, 69, 0, 0.2);
+    color: #ffd700;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.reg-table td {
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+
+.reg-table td span {
+    font-size: 0.85rem;
+    color: #ccc;
+    display: block;
+}
+
+.reg-table td:nth-child(1) {
+    font-weight: bold;
+    color: #ff8c00; /* Orange for the main pass price */
+}
+
+.note-text {
+    color: #ff0000;
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-shadow: 0 0 3px #000;
+}
+
+/* Event Boxes: GLASSMORPHISM CARDS */
+.event-boxes-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.event-box {
+    width: 350px;
+    min-height: 250px;
+    padding: 30px 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* GLASSMORPHISM BASE */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    
+    /* GLOWING GRADIENT BORDER/SHADOW */
+    border: 2px solid rgba(255, 140, 0, 0.5); /* Semi-transparent Orange Border */
+    box-shadow: 0 0 10px rgba(255, 69, 0, 0.6), 0 0 20px rgba(255, 140, 0, 0.3);
+    
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.event-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(255, 69, 0, 0.9); /* Stronger glow on hover */
+}
+
+.event-box h3 {
+    font-size: 2rem;
+    color: #ff0000;
+    margin-top: 0;
+    text-shadow: 0 0 5px #ff4500;
+}
+
+.read-more-btn {
+    background: #ff8c00;
+    color: #000;
+    text-decoration: none;
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    margin-top: 20px;
+    box-shadow: 0 0 10px #ff8c00;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.read-more-btn:hover {
+    background: #ffd700;
+    box-shadow: 0 0 15px #ffd700;
+}
+
+/* ===================================== */
+/* 7. FIRE FEATURE SECTION (Registration/Contact) */
+/* ===================================== */
+
+.fire-section {
+    padding: 60px 20px 80px 20px;
+    margin-top: 50px;
+}
+
+/* --- 7.1 Registration Banner (New Card Style) --- */
+.fire-banner-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+    position: relative; /* Container for absolute brackets */
+    max-width: 800px;
+    margin: 0 auto 50px auto;
+}
+
+.fire-banner.new-card-style {
+    max-width: 550px;
+    width: 95%;
+    padding: 30px 40px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.8);
+    border: 2px solid #ff4500;
+    z-index: 10; /* Ensure card is above brackets */
+}
+
+/* HEXAGON ICON STYLING */
+.banner-icon-placeholder {
+    font-size: 0; /* Hide default placeholder text */
+    width: 50px;
+    height: 50px;
+    position: relative;
+    margin: 0 auto 10px auto;
+    /* Hexagon shape achieved using a container and two pseudo-elements */
+}
+
+.banner-icon-placeholder::before,
+.banner-icon-placeholder::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ff4500; /* Orange-Red base */
+    box-shadow: 0 0 5px #ff0000, 0 0 10px #ff8c00;
+    border-radius: 5px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.banner-icon-placeholder::before {
+    background: #ff8c00; /* Top layer, slightly lighter */
+    transform: rotate(60deg);
+}
+
+.banner-icon-placeholder::after {
+    background: #ff4500; /* Bottom layer */
+    transform: rotate(120deg);
+}
+
+/* NEW BRACKET STYLING FIX (Final Sizing and Positioning for visual alignment) */
+.fire-bracket {
+    position: absolute;
+    top: 51%; /* Adjusted vertical alignment UPWARDS (less than 53%) */
+    transform: translateY(-50%);
+    font-size: 10rem; /* Large size */
+    font-weight: 100;
+    color: #ff4500; /* Fire color */
+    text-shadow: 0 0 20px #ff0000, 0 0 40px rgba(255, 165, 0, 0.8);
+    z-index: 5; 
+    pointer-events: none;
+    line-height: 0.8; 
+    font-family: 'Times New Roman', serif; 
+    opacity: 0.8;
+}
+
+.left-bracket {
+    left: -180px; /* Adjusted position FURTHER OUT */
+}
+.left-bracket::before {
+    content: "{";
+}
+
+.right-bracket {
+    right: -180px; /* Adjusted position FURTHER OUT */
+}
+.right-bracket::before {
+    content: "}";
+}
+
+
+.banner-sub-text {
+    color: #ffd700;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.fire-banner .main-header {
+    font-size: 2rem;
+    color: #fff;
+    margin: 0 0 15px 0;
+    font-weight: 700;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+.banner-deadline-text {
+    color: #ccc;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.banner-deadline-text strong {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.banner-date-time {
+    color: #ffd700;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+.fire-btn.new-btn-style {
+    padding: 10px 40px;
+    font-size: 1.1rem;
+    border-radius: 8px; /* Square button corners */
+    text-transform: capitalize;
+    font-weight: 600;
+    background: linear-gradient(to right, #ff4500, #ff8c00);
+}
+
+/* --- 7.2 Contact Boxes --- */
+.contact-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap; /* Allows wrapping on small screens */
+    margin: 50px auto;
+    max-width: 1200px;
+}
+
+.contact-box {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px 20px;
+    width: 250px;
+    border-radius: 12px;
+    border: 1px solid #ff4500;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.contact-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 69, 0, 0.9);
+}
+
+.icon-wrap {
+    background: #ff4500;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px #ff4500;
+}
+
+/* Placeholder icons - replace with actual Font Awesome/SVG if used */
+.icon-placeholder {
+    font-size: 24px;
+    color: #000; /* Icons dark for contrast */
+}
+
+.contact-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ff0000;
+    margin: 5px 0;
+}
+
+/* Styling for Instagram box */
+.insta-box .contact-label {
+    color: #ff0000; /* Intense Red for the "Instagram" label */
+    text-shadow: 0 0 5px #ff4500;
+}
+
+.contact-detail {
+    color: #f0f0f0;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ===================================== */
+/* 8. FOOTER SECTION                     */
+/* ===================================== */
+
+.fire-footer {
+  background-color: #000; /* Solid black background */
+  padding: 40px 20px 20px 20px;
+  border-top: 3px solid #ff4500; /* Red top border/glow effect */
+  box-shadow: 0 -5px 20px rgba(255, 69, 0, 0.5); /* Fire glow effect */
+  text-align: left;
+  position: relative;
+}
+
+/* Footer Navigation Links */
+.footer-nav {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.footer-nav a {
+  color: #ff8c00; /* Orange links */
+  text-decoration: none;
+  font-weight: 500;
+  margin: 0 15px;
+  font-size: 1rem;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.footer-nav a:hover {
+  color: #fff;
+  text-shadow: 0 0 5px #ff4500;
+}
+
+/* NEW: Footer Content Layout - single line spread */
+.footer-content-clean {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Vertically center items */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 69, 0, 0.1); /* Subtle separator */
+}
+
+.footer-logo {
+  text-align: left;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff0000; /* Red logo text */
+  display: block;
+  text-shadow: 0 0 5px #ff4500;
+}
+
+.logo-tagline {
+  color: #ffd700;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.footer-message {
+  flex-grow: 1; /* Allow the message to take up available space */
+  max-width: 400px;
+  color: #ccc;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.footer-copyright-clean {
+  color: #ff4500;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff4500;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff4500;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.scroll-to-top:hover {
+  background-color: #ff8c00;
+  box-shadow: 0 0 15px #ff8c00;
+}
+
+
+/* ===================================== */
+/* 9. RESPONSIVENESS (MEDIA QUERIES)     */
+/* ===================================== */
+
+/* Tablet and smaller screens (Max-width: 768px) */
+@media (max-width: 768px) {
+  
+  .hero-section > header { padding: 0 15px; } /* Smaller padding for header */
+  .hero-section .logo { font-size: 1.4rem; }
+
+  .main-heading { font-size: 2.2rem; padding-top: 20px; }
+  .subtitle { font-size: 1.4rem; }
+  
+  .countdown-section { margin: 30px auto; /*width: 95%;*/ padding: 20px 15px; }
+  .blaze-heading { font-size: 1.8rem; }
+  
+  .date-time-box { flex-direction: column; gap: 15px; margin-bottom: 20px; }
+  .time-item { max-width: 100%; }
+
+  #countdown .time-box { font-size: 0.9rem; padding: 5px 5px; }
+  #countdown .time-box span { font-size: 2rem; }
+
+  .about-heading { font-size: 2rem; }
+  .about-paragraph { font-size: 1rem; padding: 20px; line-height: 1.5; }
+
+  /* New Feature Responsiveness */
+  .fire-banner { padding: 30px; }
+  .fire-banner .main-header { font-size: 2rem; }
+  .fire-btn { padding: 12px 25px; font-size: 1rem; }
+  
+  .contact-box { width: 45%; margin: 10px; } /* Two per row */
+  .contact-grid { gap: 10px; }
+  
+  .reg-table th, .reg-table td { font-size: 0.9rem; padding: 10px 5px; }
+  .reg-table td span { font-size: 0.75rem; }
+  .event-boxes-grid { gap: 20px; }
+  .event-box { width: 45%; min-height: 200px; }
+  .event-box h3 { font-size: 1.6rem; }
+  .read-more-btn { padding: 8px 20px; }
+  
+  /* Brackets hidden on small screens */
+  .fire-bracket { display: none; }
+}
+
+/* Mobile phones (Max-width: 480px) */
+@media (max-width: 480px) {
+  .hero-section .logo { font-size: 1.2rem; }
+
+  .main-heading { font-size: 1.8rem; padding-top: 40px; }
+  .subtitle { font-size: 1.2rem; }
+  
+  .countdown-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  #countdown .time-box span { font-size: 1.8rem; }
+  .about-heading { font-size: 1.6rem; }
+
+  /* New Feature Responsiveness */
+  .fire-banner .main-header { font-size: 1.5rem; }
+  .fire-banner .date-time { font-size: 1rem; }
+  
+  .contact-box { width: 100%; margin: 10px 0; } /* One per row */
+  
+  .reg-table th, .reg-table td { font-size: 0.8rem; padding: 8px 3px; }
+  .event-box { width: 100%; margin-bottom: 20px; }
+  
+  /* Footer Responsiveness */
+  .footer-nav { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .footer-nav a { margin: 0; }
+  .scroll-to-top { right: 10px; bottom: 10px; }
+}

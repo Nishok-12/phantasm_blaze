@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" href="gceblogo.png" type="image/x-icon">
+      <link rel="icon" href="logo.png" type="image/x-icon">
     <title>Register</title>
     <style>
+@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: url('bg.jpg') no-repeat center center / cover;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
+            background: url('conbg.jpg') no-repeat center center / cover;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -20,7 +23,7 @@
 
         header, footer {
         position: relative;
-        background: url('1.jpg') no-repeat center center / cover;
+        background: transparent;
         color: white;
         display: flex;
         justify-content: space-between;
@@ -41,6 +44,9 @@
     header .logo {
         font-size: 1.5em;
         font-weight: bold;
+        font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
         z-index: 2;
     }
 
@@ -107,7 +113,7 @@
 
 
     header nav a:hover {
-        color: #059AD2;
+        color: #970202;
     }
 
     footer {
@@ -129,7 +135,7 @@
     }
 
     footer a {
-        color: #059AD2;
+        color: #970202;
         text-decoration: none;
     }
 
@@ -168,7 +174,7 @@
     right: -100%;
     width: 250px;
     height: 100vh;
-    background: url('1.jpg') no-repeat center center / cover;
+    background: url('11.jpg') no-repeat center center / cover;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -194,7 +200,7 @@
     max-width: 500px;
     margin: 50px auto;
     padding: 20px;
-    background-color: rgba(4, 157, 214, 0.2); /* Semi-transparent background */
+    background-color: rgba(199, 13, 13, 0.2); /* Semi-transparent background */
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     animation: pulse 3s infinite;
@@ -209,6 +215,9 @@
         }
         .form-group {
             margin-bottom: 15px;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
         }
         .form-group label {
             display: block;
@@ -241,16 +250,19 @@
         .form-group button {
             width: 100%;
             padding: 16px;
-            background-color: #45b0f8;
+            background-color: #970202;
             color: white;
             border: none;
             border-radius: 4px;
+            font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
             font-size: 1.2em;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         .form-group button:hover {
-            background-color: #45a049;
+            background-color: rgb(82, 20, 20);
         }
         .form-group .error {
             color: red;
@@ -260,9 +272,8 @@
     </style>
 </head>
 <body>
-
     <header>
-        <div class="logo">Phantasm'25</div>
+        <div class="logo">Phantasm Blaze</div>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()">
             <div></div>
             <div></div>
@@ -274,21 +285,18 @@
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
             <a href="contact-us.html">Contact</a>
-
-<a href="#" id="profileLinkDesktop">Profile</a>
+            <a href="#" id="profileLinkDesktop">Profile</a>
             <a href="login.html">Login</a>
         </nav>
         <div class="side-menu" id="sideMenu">
-            <!-- Example folder-based links -->
             <a href="index.html">Home</a>
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
             <a href="contact-us.html">Contact</a>
-<a href="#" id="profileLinkMobile">Profile</a>
+            <a href="#" id="profileLinkMobile">Profile</a>
             <a href="login.html">Login</a>
         </div>
     </header>
-
     <div class="register-container">
         <h1>Register</h1>
         <form id="registerForm" method="POST" action="/register">
@@ -331,60 +339,104 @@
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </div>
             <div class="form-group">
-                <label for="transid">Transaction ID</label>
-                <input type="text" id="departmenttransid" name="transid" required>
-            </div>
-            <div class="form-group">
-                <label for="accommodation">Accommodation</label>
-                <select id="accommodation" name="accommodation" required>
-                    <option value="">Do you need accommodation?</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="Pass">Registration Type</label>
-                <select id="Pass" name="Pass" required>
-                    <option value="">Do you pay 150Rs.(Single) or 250Rs.(Pass)?</option>
-                    <option value="Pass">All Event Pass</option>
-                    <option value="single">Singke Event</option>
-                    
-                </select>
-            </div>
-            <div class="form-group">
                 <label for="role">Role</label>
                 <select id="role" name="role" required>
-                    <option value="">Select Role</option>
+                    <option value="" disabled selected>Select Role</option>
                     <option value="user">Participant</option>
                     <option value="admin">Admin</option>
                 </select>
             </div>
+            <div class="form-group" id="passGroup" style="display: none;">
+                <label for="Pass">Registration Type</label>
+                <select id="Pass" name="Pass">
+                    <option value="" disabled selected>Do you pay 150Rs.(Single) or 250Rs.(Blaze)?</option>
+                    <option value="Pass">Blaze Pass</option>
+                    <option value="single">Single Event</option>
+                </select>
+            </div>
+            <div class="form-group" id="qrCodeGroup" style="display: none;">
+                <p>Scan to Pay</p>
+                <img id="qrCode" src="" alt="QR Code" style="width: 200px; height: 200px;">
+            </div>
+            <div class="form-group" id="transidGroup" style="display: none;">
+                <label for="transid">Transaction ID</label>
+                <input type="text" id="transid" name="transid">
+            </div>
+            <div class="form-group" id="accommodationGroup" style="display: none;">
+                <label for="accommodation">Accommodation</label>
+                <select id="accommodation" name="accommodation">
+                    <option value="" disabled selected>Do you need accommodation?</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            
             <div class="form-group" id="adminKeyGroup" style="display: none;">
                 <label for="admin_key">Admin Key</label>
                 <input type="password" id="admin_key" name="admin_key" placeholder="Enter admin key">
             </div>
             <div class="form-group">
-                
-                <button type="submit" >Register</button>
+                <button type="submit">Register</button>
             </div>
         </form>
     </div>
     <footer>
         <p>&copy; 2025 CSEA. All rights reserved.</p>
     </footer>
-
- <script>
+    <script>
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("registerForm");
         const roleSelect = document.getElementById('role');
         const adminKeyGroup = document.getElementById('adminKeyGroup');
         const adminKeyInput = document.getElementById('admin_key');
 
+        // New elements for the requested functionality
+        const transidGroup = document.getElementById('transidGroup');
+        const passGroup = document.getElementById('passGroup');
+        const passSelect = document.getElementById('Pass');
+        const qrCodeGroup = document.getElementById('qrCodeGroup');
+        const qrCodeImage = document.getElementById('qrCode');
+        const accommodationGroup = document.getElementById('accommodationGroup'); // Get the new accommodation element
+
+        // Event listener for the role dropdown
         roleSelect.addEventListener('change', () => {
             if (roleSelect.value === 'admin') {
+                // Show admin key field and hide participant fields
                 adminKeyGroup.style.display = 'block';
-            } else {
+                transidGroup.style.display = 'none';
+                passGroup.style.display = 'none';
+                qrCodeGroup.style.display = 'none';
+                accommodationGroup.style.display = 'none'; // Hide accommodation for admin
+            } else if (roleSelect.value === 'user') {
+                // Show participant fields and hide admin key field
                 adminKeyGroup.style.display = 'none';
+                transidGroup.style.display = 'block';
+                passGroup.style.display = 'block';
+                accommodationGroup.style.display = 'block'; // Show accommodation for user
+                
+                // Reset and hide QR code when the role changes to user
+                passSelect.value = '';
+                qrCodeGroup.style.display = 'none';
+            } else {
+                // Hide all role-specific fields for initial "Select Role" option
+                adminKeyGroup.style.display = 'none';
+                transidGroup.style.display = 'none';
+                passGroup.style.display = 'none';
+                qrCodeGroup.style.display = 'none';
+                accommodationGroup.style.display = 'none';
+            }
+        });
+
+        // Event listener for the registration type dropdown
+        passSelect.addEventListener('change', () => {
+            if (passSelect.value === 'single') {
+                qrCodeImage.src = 'singleqr.png';
+                qrCodeGroup.style.display = 'block';
+            } else if (passSelect.value === 'Pass') {
+                qrCodeImage.src = 'blazeqr.png';
+                qrCodeGroup.style.display = 'block';
+            } else {
+                qrCodeGroup.style.display = 'none';
             }
         });
 
@@ -395,10 +447,24 @@
                 alert("Please enter a valid 10-digit phone number.");
                 return;
             }
-            if (roleSelect.value === 'admin' && !adminKeyInput.value) {
-                alert("Admin Key is required for Admin role.");
-                return;
+
+            // Check for required fields based on role
+            if (roleSelect.value === 'admin') {
+                if (!adminKeyInput.value) {
+                    alert("Admin Key is required for Admin role.");
+                    return;
+                }
+            } else if (roleSelect.value === 'user') {
+                const transidInput = document.getElementById('transid');
+                const accommodationInput = document.getElementById('accommodation');
+                const passInput = document.getElementById('Pass');
+                
+                if (!transidInput.value || !accommodationInput.value || !passInput.value) {
+                    alert("Please fill in all required participant fields.");
+                    return;
+                }
             }
+
             const formData = new FormData(form);
             const formObject = Object.fromEntries(formData.entries());
             try {
@@ -423,29 +489,25 @@
         });
     });
 
-             function toggleMenu() {
-            const sideMenu = document.getElementById('sideMenu');
-            const hamburger = document.getElementById('hamburger');
-            const closeIcon = document.getElementById('closeIcon');
-    
-            // Toggle side menu visibility
-            sideMenu.classList.toggle('open');
-    
-            // Toggle visibility of hamburger and close icon
-            if (sideMenu.classList.contains('open')) {
-                hamburger.style.display = 'none';
-                closeIcon.style.display = 'block';
-            } else {
-                hamburger.style.display = 'flex';
-                closeIcon.style.display = 'none';
-            }
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const hamburger = document.getElementById('hamburger');
+        const closeIcon = document.getElementById('closeIcon');
+
+        sideMenu.classList.toggle('open');
+
+        if (sideMenu.classList.contains('open')) {
+            hamburger.style.display = 'none';
+            closeIcon.style.display = 'block';
+        } else {
+            hamburger.style.display = 'flex';
+            closeIcon.style.display = 'none';
         }
+    }
 
-
-document.querySelector('.logo').addEventListener('click', function() {
-    window.location.href = 'index.html';
-  });
-    
+    document.querySelector('.logo').addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
 </script>
 </body>
 </html>
