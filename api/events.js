@@ -7,15 +7,14 @@ const router = express.Router();
 
 // ✅ GLOBAL TRANSPORTER (reuse for all emails)
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // STARTTLS
+  service: "gmail",
   auth: {
-    user: 'phantasmblaze26@gmail.com',
-    pass: 'yxxxesriofsqnmmz', // 🔥 App password (no spaces)
+    user: "phantasmblaze26@gmail.com",
+    pass: "yxxxesriofsqnmmz", // App password (no spaces)
   },
-  logger: true,   // optional: enable SMTP logs
-  debug: true     // optional: debug SMTP flow
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 // ✅ UTILITY: Check slots taken
@@ -55,8 +54,8 @@ const hasSinglePassRestriction = async (userId) => {
   return false;
 };
 
-// ✅ SEND REGISTRATION EMAIL
-async function sendRegistrationEmail(name, email, qrCodeId, event) {
+/// Send registration email
+const sendRegistrationEmail = async (name, email, qrCodeId, event) => {
   const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "long",
@@ -66,20 +65,20 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
   const mailOptions = {
     from: "phantasmblaze26@gmail.com",
     to: email,
-    subject: `You're Officially Registered! 🎉 – ${event.name}`,
+    subject: `You're Registered! 🎉 – ${event.name}`,
     html: `
       <p>Dear ${name},</p>
-      <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>!</p>
-      <h3>✅ Your Registration Details:</h3>
+      <p>Your registration for <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong> is confirmed.</p>
+      <h3>✅ Details:</h3>
       <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Event Registered:</strong> ${event.name}</p>
       <p><strong>User ID:</strong> ${qrCodeId}</p>
-      <p>Stay updated at: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
-      <p><strong>Best Regards,</strong><br/>Phantasm Blaze Team</p>
+      <p><strong>Event:</strong> ${event.name}</p>
+      <p>Stay updated: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
+      <p><strong>Regards,</strong><br/>Phantasm Blaze Team</p>
     `,
   };
 
-   try {
+try {
     const info = await transporter.sendMail(mailOptions);
     console.log(`[MAIL SENT ✅] ${email}: ${info.response}`);
     return true;
@@ -87,8 +86,7 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
     console.error(`[MAIL ERROR ❌] ${email}:`, error);
     return false;
   }
-}
-
+};
 
 // POST route to handle event registration
 router.post("/register", requireAuth, async (req, res) => {
@@ -218,3 +216,6 @@ router.get("/get-events", async (req, res) => {
 });
 
 export default router;
+
+
+
