@@ -65,7 +65,7 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
 
   const mailOptions = {
     from: "phantasmblaze26@gmail.com",
-    to: email,
+    to: "cyberkingnishok2005@gmail.com",
     subject: `You're Officially Registered! 🎉 – ${event.name}`,
     html: `
       <p>Dear ${name},</p>
