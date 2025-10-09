@@ -9,43 +9,85 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
-import axios from "axios"; // 👈 New: Import Axios for HTTP requests
-
-// NOTE: The previous Nodemailer and transporter imports are removed.
+import nodemailer from "nodemailer"; // 🟢 RESTORED: Use Nodemailer
 
 dotenv.config();
 
 const router = express.Router();
 
-// Define the URL for your PHP mailer endpoint
-// *** CRITICAL: Update this URL to match your live server/domain ***
-const PHP_MAIL_ENDPOINT = 'https://phantasm-blaze.onrender.com/send_email.php'; 
+// ❌ REMOVED: The sendEmailViaPhp helper function
 
-// Helper function to send email via the external PHP endpoint
-async function sendEmailViaPhp(to, subject, htmlBody, fromName = "Phantasm Blaze Team") {
-    const emailData = {
-        to: to,
-        subject: subject,
-        html: htmlBody,
-        // The PHP script uses SMTP_USER as the actual sender.
-        from_name: fromName 
+// Helper function to send email for password reset
+async function sendPasswordResetEmail(email, resetToken) {
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS, // Google App Password
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset Request',
+        html: `
+            <p>You requested a password reset. Use the following token to reset your password:</p>
+            <h3>${resetToken}</h3>
+            <p>This token is valid for 1 hour.</p>
+        `,
+    };
+    
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error("[Email] Nodemailer Error during password reset:", error);
+        return false;
+    }
+}
+
+// Helper function to send registration email with attachment
+async function sendRegistrationEmailWithAttachment(name, email, qrCodeId, posterPath) {
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS, // Google App Password
+        },
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Welcome to Phantasm'25! 🎉",
+        html: `
+            <h2>Hello ${name},</h2>
+            <p>Welcome to our symposium! 🎉</p>
+            <p>Your ID: <strong>${qrCodeId}</strong></p>
+            <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
+            <p>Instructions to register for an event:</p>
+            <ul>
+                <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
+                <li>Select an event and confirm your participation.</li>
+            </ul>
+            <p>See you at the event! 🥳</p>
+            <p>Best Regards,<br/>Phantasm Team</p>
+        `,
+        attachments: [
+            {
+                filename: "poster.pdf",
+                path: posterPath,
+            },
+        ],
     };
 
     try {
-        // Axios automatically sends data as JSON (application/json)
-        const response = await axios.post(PHP_MAIL_ENDPOINT, emailData);
-        
-        console.log("PHP Email Service Response:", response.data);
-        return { success: true, message: response.data.message || "Email request successful." };
-
+        await transporter.sendMail(mailOptions);
+        return true;
     } catch (error) {
-        // Handle PHP endpoint errors or connection issues
-        const errorMessage = error.response 
-            ? `PHP Error: ${error.response.status} - ${error.response.data.message}`
-            : `Connection Error: ${error.message}`;
-
-        console.error("Error sending email via PHP Endpoint:", errorMessage);
-        return { success: false, message: `Failed to send email. ${errorMessage}` };
+        console.error("[Email] Nodemailer Error during registration:", error);
+        return false;
     }
 }
 
@@ -59,29 +101,15 @@ router.post('/forgot-password', async (req, res) => {
         const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         if (user.length === 0) return res.json({ success: false, message: 'Email not found' });
 
-        // Generate Token
         const resetToken = crypto.randomBytes(20).toString('hex');
-        const expires = Date.now() + 3600000; // 1 hour expiry
+        const expires = Date.now() + 3600000;
 
-        // Store the token in the database
         await db.query('UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?', [resetToken, expires, email]);
 
-        // Construct HTML body
-        const htmlBody = `
-            <p>You requested a password reset. Use the following token to reset your password:</p>
-            <h3>${resetToken}</h3>
-            <p>This token is valid for 1 hour.</p>
-        `;
+        const sendResult = await sendPasswordResetEmail(email, resetToken);
 
-        // 🟢 Send Email via PHP Endpoint
-        const sendResult = await sendEmailViaPhp(
-            email, 
-            'Password Reset Request', 
-            htmlBody
-        );
-
-        if (!sendResult.success) {
-            console.warn(`[Forgot Password] Email to ${email} failed: ${sendResult.message}`);
+        if (!sendResult) {
+            console.warn(`[Forgot Password] Email to ${email} failed.`);
         }
 
         res.json({ success: true, message: 'Reset token sent to your email.' });
@@ -90,23 +118,19 @@ router.post('/forgot-password', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error, please try again later.' });
     }
 });
+
 router.post('/reset-password', async (req, res) => {
     const { email, resetToken, newPassword } = req.body;
-
     try {
-        // Verify user & token
         const [user] = await db.query('SELECT * FROM users WHERE email = ? AND reset_token = ?', [email, resetToken]);
 
         if (user.length === 0) {
             return res.json({ success: false, message: 'Invalid token or email.' });
         }
-
-        // Check if token is expired
         if (Date.now() > user[0].reset_expires) {
             return res.json({ success: false, message: 'Token expired, request a new one.' });
         }
 
-        // Hash new password and update DB
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await db.query('UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE email = ?', [hashedPassword, email]);
 
@@ -198,30 +222,11 @@ router.post("/register", async (req, res) => {
             console.error("Poster file not found:", posterPath);
         }
 
-        const mailHtmlContent = `
-            <h2>Hello ${name},</h2>
-            <p>Welcome to our symposium! 🎉</p>
-            <p>Your ID: <strong>${qrCodeId}</strong></p>
-            <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
-            <p>Instructions to register for an event:</p>
-            <ul>
-                <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
-                <li>Select an event and confirm your participation.</li>
-            </ul>
-            <p>See you at the event! 🥳</p>
-            <p>Best Regards,<br/>Phantasm Blaze Team</p>
-        `;
+        // 🟢 Send registration email using the native Nodemailer function
+        const sendResult = await sendRegistrationEmailWithAttachment(name, email, qrCodeId, posterPath);
 
-        // 🟢 Send Email via PHP Endpoint (Replaces Nodemailer call)
-        const sendResult = await sendEmailViaPhp(
-            email, 
-            "Welcome to Phantasm Blaze! 🎉", 
-            mailHtmlContent
-        );
-
-        if (!sendResult.success) {
-            console.warn(`[Registration] Email to ${email} failed: ${sendResult.message}`);
-            // Note: Registration still succeeds, but log the email failure.
+        if (!sendResult) {
+            console.warn(`[Registration] Email to ${email} failed.`);
         }
 
         res.status(201).json({

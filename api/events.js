@@ -1,37 +1,11 @@
 import express from "express";
 import db from "../utils/db.js";
 import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
-import axios from "axios"; // 👈 NEW: Import Axios for HTTP requests
+import nodemailer from "nodemailer"; // 🟢 RESTORED: Use Nodemailer for email sending
 
 const router = express.Router();
 
-// Define the URL for your PHP mailer endpoint
-// *** CRITICAL: Update this URL to match your live server/domain ***
-const PHP_MAIL_ENDPOINT = 'https://phantasm-blaze.onrender.com/send_email.php'; 
-
-// Helper function to send email via the external PHP endpoint (Copied from auth.js)
-async function sendEmailViaPhp(to, subject, htmlBody, fromName = "Phantasm Blaze Team") {
-    const emailData = {
-        to: to,
-        subject: subject,
-        html: htmlBody,
-        from_name: fromName 
-    };
-
-    try {
-        const response = await axios.post(PHP_MAIL_ENDPOINT, emailData);
-        console.log("PHP Email Service Response:", response.data);
-        return { success: true, message: response.data.message || "Email request successful." };
-    } catch (error) {
-        const errorMessage = error.response 
-            ? `PHP Error: ${error.response.status} - ${error.response.data.message}`
-            : `Connection Error: ${error.message}`;
-
-        console.error("Error sending email via PHP Endpoint:", errorMessage);
-        return { success: false, message: `Failed to send email. ${errorMessage}` };
-    }
-}
-
+// ❌ REMOVED: PHP_MAIL_ENDPOINT and the sendEmailViaPhp helper function
 
 // Add this new route below the existing ones in events.js
 router.get("/slots-taken/:eventId", async (req, res) => {
@@ -143,12 +117,10 @@ router.post("/register", requireAuth, async (req, res) => {
             if (existingUser.length === 0) {
                 return res.status(400).json({ error: `Teammate with ID ${t} does not exist!` });
             }
-            // ***FIXED: Removed the infinite loop bug. The array is already valid here.***
         }
 
         // 6. INSERT DATA
         const allMembers = [userId, ...validTeammates];
-        // Use Promise.all to insert all registrations concurrently for better performance
         const registrationPromises = allMembers.map(memberId =>
             db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [memberId, eventId])
         );
@@ -156,7 +128,6 @@ router.post("/register", requireAuth, async (req, res) => {
 
         // Insert into teams table
         const teamMembersString = allMembers.join(",");
-        // ***FIXED: Always insert a team record, even for solo registrations.***
         await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
         // 7. FINALIZE (Email and Response)
@@ -164,8 +135,8 @@ router.post("/register", requireAuth, async (req, res) => {
         if (user.length === 0) return res.status(404).json({ error: "User not found!" });
 
         const sendResult = await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
-        if (!sendResult.success) {
-            console.warn(`[Event Reg] Email to ${user[0].email} failed: ${sendResult.message}`);
+        if (sendResult === false) {
+            console.warn(`[Event Reg] Email to ${user[0].email} failed: Could not send email.`);
         }
 
         return res.status(201).json({ message: "Registration successful!", team: teamMembersString });
@@ -176,32 +147,47 @@ router.post("/register", requireAuth, async (req, res) => {
     }
 });
 
-// ❌ OLD Nodemailer function is replaced with new PHP sending logic
+// 🟢 The email sending logic using Nodemailer
 async function sendRegistrationEmail(name, email, qrCodeId, event) {
-    
-    // Format the date for the email content
+    const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: process.env.EMAIL_USER, 
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
     const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
         year: "numeric",
         month: "long",
         day: "numeric",
     });
 
-    const htmlBody = `
-        <p>Dear ${name},</p>
-        <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>! Your registration has been confirmed, and we can’t wait to see you there.</p>
-        <h3>✅ Your Registration Details:</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Event Registered:</strong> ${event.name}</p>
-        <p><strong>user ID:</strong> ${qrCodeId}</p>
-        <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
-        <p>See you soon!</p>
-        <p><strong>Best Regards,</strong></p>
-        <p>Phantasm Blaze Team</p>
-    `;
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: `You're Officially Registered! 🎉 – ${event.name}`,
+        html: `
+            <p>Dear ${name},</p>
+            <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>! Your registration has been confirmed, and we can’t wait to see you there.</p>
+            <h3>✅ Your Registration Details:</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Event Registered:</strong> ${event.name}</p>
+            <p><strong>user ID:</strong> ${qrCodeId}</p>
+            <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
+            <p>See you soon!</p>
+            <p><strong>Best Regards,</strong></p>
+            <p>Phantasm Blaze Team</p>
+        `,
+    };
 
-    // 🟢 Send email using the shared PHP utility function
-    const subject = `You're Officially Registered! 🎉 – ${event.name}`;
-    return await sendEmailViaPhp(email, subject, htmlBody);
+    try {
+        await transporter.sendMail(mailOptions);
+        return true; 
+    } catch (error) {
+        console.error("[Email] Nodemailer Error:", error);
+        return false; 
+    }
 }
 
 // 🟢 Get All Events (Public Route)
@@ -218,6 +204,5 @@ router.get("/get-events", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch events." });
     }
 });
-
 
 export default router;
