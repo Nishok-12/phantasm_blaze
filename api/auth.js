@@ -3,29 +3,19 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { requireAuth } from "../middleware.js";
+import { requireAuth } from "./middleware.js";
 import db from "../utils/db.js";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
+// Import the new transporter utility
+import transporter from "../utils/transporter.js";
+
 dotenv.config();
 
 const router = express.Router();
-
-// Configure Nodemailer
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
-
-
-dotenv.config();
 
 // Define file path for the poster
 const posterPath = path.resolve("public", "poster.pdf");
@@ -46,7 +36,7 @@ router.post('/forgot-password', async (req, res) => {
 
         // Send Email
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: "your_email@gmail.com", // Hardcoded for this example
             to: email,
             subject: 'Password Reset Request',
             text: `Use the following token to reset your password: ${resetToken}\n\nThis token is valid for 1 hour.`
@@ -94,7 +84,6 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
-// Helper function for async DB queries
 const queryDatabase = async (query, values) => {
     try {
         const [results] = await db.query(query, values);
@@ -103,7 +92,7 @@ const queryDatabase = async (query, values) => {
         throw error;
     }
 };
-// User Registration Route with Poster Attachment
+
 router.post("/register", async (req, res) => {
     try {
         const {
@@ -118,8 +107,8 @@ router.post("/register", async (req, res) => {
             accommodation,
             role,
             admin_key,
-            transid, // <-- Added transid
-            Pass // <-- Added Pass
+            transid,
+            Pass
         } = req.body;
 
         if (!name || !college || !department || !reg_no || !year || !phone || !email || !password || !accommodation || !role || !transid || !Pass) {
@@ -137,7 +126,6 @@ router.post("/register", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Check if the user already exists by email or registration number
         const [existingUser] = await db.query(
             "SELECT id FROM users WHERE email = ?",
             [email]
@@ -147,14 +135,11 @@ router.post("/register", async (req, res) => {
             return res.status(409).json({ error: "User with this email already exists." });
         }
 
-        // The query needs to be updated to include `transid` and `Pass`
         const result = await db.query(
             `INSERT INTO users (name, college, department, reg_no, year, phone, email, password, accommodation, role, transid, Pass) 
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [name, college, department, reg_no, year, phone, email, hashedPassword, accommodation, role, transid, Pass]
         );
-
-
 
         const userId = result.insertId;
         const qrCodeId = `PSM_${userId}`;
@@ -163,19 +148,17 @@ router.post("/register", async (req, res) => {
 
         const token = jwt.sign({ email, role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        // Check if poster file exists before sending
         if (!fs.existsSync(posterPath)) {
             console.error("Poster file not found:", posterPath);
         }
 
-        // Send Welcome Email with Poster Attachment
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: "your_email@gmail.com", // Hardcoded for this example
             to: email,
             subject: "Welcome to Phantasm'25! 🎉",
             html: `
                 <h2>Hello ${name},</h2>
-                <p>Welcome to our symposium! 🚀</p>
+                <p>Welcome to our symposium! 🎉</p>
                 <p>Your ID: <strong>${qrCodeId}</strong></p>
                 <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
                 <p>Instructions to register for an event:</p>
@@ -183,15 +166,10 @@ router.post("/register", async (req, res) => {
                     <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
                     <li>Select an event and confirm your participation.</li>
                 </ul>
-                <p>See you at the event! 🏆</p>
+                <p>See you at the event! 🥳</p>
                 <p>Best Regards,<br/>Phantasm Team</p>
-            `,
-            attachments: [
-                {
-                    filename: "Phantasm25_Poster.pdf",
-                    path: posterPath, // Attach the PDF poster
-                },
-            ],
+            `
+           
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
