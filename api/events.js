@@ -5,91 +5,88 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// Utility function to check how many slots are taken for an event
-router.get("/slots-taken/:eventId", async (req, res) => {
-    try {
-        const { eventId } = req.params;
-        const [result] = await db.query(
-            "SELECT COUNT(*) AS slotsTaken FROM teams WHERE event_id = ?",
-            [eventId]
-        );
-        res.json({ slotsTaken: result[0].slotsTaken });
-    } catch (error) {
-        console.error("Error fetching slots:", error);
-        res.status(500).json({ error: "Failed to fetch slots data." });
-    }
+// ✅ GLOBAL TRANSPORTER (reuse for all emails)
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // STARTTLS
+  auth: {
+    user: 'phantasmblaze26@gmail.com',
+    pass: 'yxxxesriofsqnmmz', // 🔥 App password (no spaces)
+  },
+  logger: true,   // optional: enable SMTP logs
+  debug: true     // optional: debug SMTP flow
 });
 
-// Utility function to check if a user is already registered for an event
-const isAlreadyRegistered = async (userId, eventId) => {
+// ✅ UTILITY: Check slots taken
+router.get("/slots-taken/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
     const [result] = await db.query(
-        "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
-        [userId, eventId]
+      "SELECT COUNT(*) AS slotsTaken FROM teams WHERE event_id = ?",
+      [eventId]
     );
-    return result.length > 0;
+    res.json({ slotsTaken: result[0].slotsTaken });
+  } catch (error) {
+    console.error("Error fetching slots:", error);
+    res.status(500).json({ error: "Failed to fetch slots data." });
+  }
+});
+
+// ✅ UTILITY: Check if user already registered
+const isAlreadyRegistered = async (userId, eventId) => {
+  const [result] = await db.query(
+    "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
+    [userId, eventId]
+  );
+  return result.length > 0;
 };
 
-// Utility function to check if a user has a 'single' pass and is already registered
+// ✅ UTILITY: Check single-pass restriction
 const hasSinglePassRestriction = async (userId) => {
-    const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
-    
-    if (userPass.length > 0 && userPass[0].Pass === 'single') {
-        const [regCount] = await db.query(
-            "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
-            [userId]
-        );
-        return regCount[0].count > 0;
-    }
-    return false;
+  const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
+  if (userPass.length > 0 && userPass[0].Pass === 'single') {
+    const [regCount] = await db.query(
+      "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
+      [userId]
+    );
+    return regCount[0].count > 0;
+  }
+  return false;
 };
 
-// 🟢 The email sending logic using Nodemailer
+// ✅ SEND REGISTRATION EMAIL
 async function sendRegistrationEmail(name, email, qrCodeId, event) {
-    // Reverting to the password format that works in your environment, 
-    // including spaces as requested.
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // use false for STARTTLS; true for SSL on port 465
-        auth: {
-            user: 'phantasmblaze26@gmail.com',
-            pass: 'yxxxesriofsqnmmz',
-        }
-    });
+  const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-    const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+  const mailOptions = {
+    from: "phantasmblaze26@gmail.com",
+    to: email,
+    subject: `You're Officially Registered! 🎉 – ${event.name}`,
+    html: `
+      <p>Dear ${name},</p>
+      <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>!</p>
+      <h3>✅ Your Registration Details:</h3>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Event Registered:</strong> ${event.name}</p>
+      <p><strong>User ID:</strong> ${qrCodeId}</p>
+      <p>Stay updated at: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
+      <p><strong>Best Regards,</strong><br/>Phantasm Blaze Team</p>
+    `,
+  };
 
-    const mailOptions = {
-        from: "phantasmblaze26@gmail.com",
-        to: email,
-        subject: `You're Officially Registered! 🎉 – ${event.name}`,
-        html: `
-            <p>Dear ${name},</p>
-            <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>! Your registration has been confirmed, and we can’t wait to see you there.</p>
-            <h3>✅ Your Registration Details:</h3>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Event Registered:</strong> ${event.name}</p>
-            <p><strong>user ID:</strong> ${qrCodeId}</p>
-            <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
-            <p>See you soon!</p>
-            <p><strong>Best Regards,</strong></p>
-            <p>Phantasm Blaze Team</p>
-        `,
-        // Also including plain text version for compatibility
-        text: `Dear ${name},\n\nWe’re excited to welcome you to ${event.name} on ${formattedDate} at ${event.venue}! Your registration has been confirmed.\n\nYour Registration Details:\nName: ${name}\nEvent Registered: ${event.name}\nUser ID: ${qrCodeId}\n\nBest Regards,\nPhantasm Blaze Team`
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        return true; 
-    } catch (error) {
-        console.error("[Email] Nodemailer Error:", error);
-        return false; 
-    }
+   try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[MAIL SENT ✅] ${email}: ${info.response}`);
+    return true;
+  } catch (error) {
+    console.error(`[MAIL ERROR ❌] ${email}:`, error);
+    return false;
+  }
 }
 
 
@@ -221,4 +218,3 @@ router.get("/get-events", async (req, res) => {
 });
 
 export default router;
-
