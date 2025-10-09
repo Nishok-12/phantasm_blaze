@@ -46,7 +46,6 @@ const hasSinglePassRestriction = async (userId) => {
     return false;
 };
 
-
 router.post("/register", requireAuth, async (req, res) => {
     const { eventId, teammates = [] } = req.body;
     const userId = req.user?.userId;
@@ -63,13 +62,9 @@ router.post("/register", requireAuth, async (req, res) => {
         if (eventExists.length === 0) return res.status(404).json({ error: "Event not found!" });
 
         // 2. CHECK MAIN USER RESTRICTIONS (Single Pass & Duplicate Registration)
-        
-        // Single Pass Restriction Check (Any prior registration blocks registration)
         if (await hasSinglePassRestriction(userId)) {
             return res.status(403).json({ error: "Single Event Pass Holders Can Only Register For One Event." });
         }
-
-        // Duplicate Registration Check (Already registered for THIS specific event)
         if (await isAlreadyRegistered(userId, eventId)) {
             return res.status(400).json({ error: "User already registered for this event!" });
         }
@@ -77,7 +72,6 @@ router.post("/register", requireAuth, async (req, res) => {
         // 3. DETERMINE RULES
         let maxTeammates = 0;
         let allowSolo = true;
-
         if (eventId === 1) {
             maxTeammates = 1;
             allowSolo = true;
@@ -93,16 +87,14 @@ router.post("/register", requireAuth, async (req, res) => {
         const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
         const validTeammates = processedTeammates.filter(t => t !== 0);
 
-        // **NEW: Check for duplicate IDs within the team**
         const allTeamMembers = [userId, ...validTeammates];
         const uniqueMembers = new Set(allTeamMembers);
         if (allTeamMembers.length !== uniqueMembers.size) {
             return res.status(400).json({ error: "Duplicate user IDs found in team members." });
         }
 
-        // Validate team size
         if (validTeammates.length > maxTeammates) {
-             return res.status(400).json({ error: `This event allows a maximum of ${maxTeammates} teammate(s).` });
+            return res.status(400).json({ error: `This event allows a maximum of ${maxTeammates} teammate(s).` });
         }
         if (!allowSolo && validTeammates.length === 0) {
             return res.status(400).json({ error: "All teammates are required for this event, no solo allowed." });
@@ -111,54 +103,40 @@ router.post("/register", requireAuth, async (req, res) => {
             return res.status(400).json({ error: "Invalid teammate ID format!" });
 
         // 5. CHECK TEAMMATE RESTRICTIONS (Single Pass & Duplicate Registration)
-        
-        // We validate existence here to ensure we only check real users
         for (const t of validTeammates) {
-            
-            // Check for single pass restriction for each teammate
             if (await hasSinglePassRestriction(t)) {
                 return res.status(403).json({ error: `Teammate with ID ${t} has a single event pass and is already registered.` });
             }
-
-            // Check if teammate is already registered for this specific event
             if (await isAlreadyRegistered(t, eventId)) {
                 return res.status(400).json({ error: `Teammate with ID ${t} is already registered for this event!` });
             }
-            
-            // Final check: Does the teammate ID exist in the users table?
             const [existingUser] = await db.query("SELECT id FROM users WHERE id = ?", [t]);
             if (existingUser.length === 0) {
                 return res.status(400).json({ error: `Teammate with ID ${t} does not exist!` });
             }
-
-            validTeammates.push(t);
+            // ***FIXED: Removed the infinite loop bug. The array is already valid here.***
         }
 
         // 6. INSERT DATA
-        
-        // Insert current user
-        await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [userId, eventId]);
-
-        // Insert teammates
-        for (const t of validTeammates) {
-            await db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [t, eventId]);
-        }
+        const allMembers = [userId, ...validTeammates];
+        // Use Promise.all to insert all registrations concurrently for better performance
+        const registrationPromises = allMembers.map(memberId =>
+            db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [memberId, eventId])
+        );
+        await Promise.all(registrationPromises);
 
         // Insert into teams table
-        const allMembers = [userId, ...validTeammates].join("+");
-        if (validTeammates.length > 0) {
-            await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, allMembers]);
-        }
+        const teamMembersString = allMembers.join("+");
+        // ***FIXED: Always insert a team record, even for solo registrations.***
+        await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
         // 7. FINALIZE (Email and Response)
-        
-        // Fetch user for email
         const [user] = await db.query("SELECT name, email, qr_code_id FROM users WHERE id = ?", [userId]);
         if (user.length === 0) return res.status(404).json({ error: "User not found!" });
 
         await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
 
-        return res.status(201).json({ message: "Registration successful!", team: allMembers });
+        return res.status(201).json({ message: "Registration successful!", team: teamMembersString });
 
     } catch (error) {
         console.error("Database error:", error);
