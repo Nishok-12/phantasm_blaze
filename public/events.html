@@ -141,35 +141,32 @@
 <body>
     <div class="wrapper">
 
-        <!-- Header -->
         <header>
-        <div class="logo">Phantasm Blaze</div>
-        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="events.html">Events</a>
-            <a href="schedule.html">Schedule</a>
-            <a href="contact-us.html">Contact</a>
-            <a href="profile.html" id="profileLinkDesktop">Profile</a>
-            <a href="login.html">Login</a>
-        </nav>
-        <div class="side-menu" id="sideMenu">
-            <!-- Example folder-based links -->
-            <a href="index.html">Home</a>
-            <a href="events.html">Events</a>
-            <a href="schedule.html">Schedule</a>
-            <a href="contact-us.html">Contact</a>
-<a href="#" id="profileLinkMobile">Profile</a>
-            <a href="login.html">Login</a>
-        </div>
-    </header>
+            <div class="logo">Phantasm Blaze</div>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="schedule.html">Schedule</a>
+                <a href="contact-us.html">Contact</a>
+                <a href="profile.html" id="profileLinkDesktop">Profile</a>
+                <a href="login.html">Login</a>
+            </nav>
+            <div class="side-menu" id="sideMenu">
+                <a href="index.html">Home</a>
+                <a href="events.html">Events</a>
+                <a href="schedule.html">Schedule</a>
+                <a href="contact-us.html">Contact</a>
+                <a href="#" id="profileLinkMobile">Profile</a>
+                <a href="login.html">Login</a>
+            </div>
+        </header>
 
-        <!-- Main Event Slider -->
         <section class="main-event-slider">
             <div class="slide-main active-slide">
                 <div class="event-info-box">
@@ -250,7 +247,6 @@
         
         </section>
 
-        <!-- Technical Events -->
         <div class="container">
             <h2>Technical Events</h2>
             <div class="slider-section">
@@ -297,7 +293,6 @@
                 <button class="nav-btn right" onclick="slide('tech', 1)">›</button>
             </div>
 
-            <!-- Non Technical Events -->
             <h2>Non Technical Events</h2>
             <div class="slider-section">
                 <button class="nav-btn left" onclick="slide('nontech', -1)">‹</button>
@@ -335,114 +330,20 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <footer>
-        <p>&copy; 2025 CSEA. All rights reserved.</p>
-    </footer>
+            <p>&copy; 2025 CSEA. All rights reserved.</p>
+        </footer>
     </div>
 
-    <!-- JavaScript -->
-     <script>
-    // Function to toggle the side menu
-function toggleMenu() {
-    const sideMenu = document.getElementById('sideMenu');
-    const hamburger = document.getElementById('hamburger');
-    const closeIcon = document.getElementById('closeIcon');
-
-    // Toggle side menu visibility
-    sideMenu.classList.toggle('open');
-
-    // Toggle visibility of hamburger and close icon
-    if (sideMenu.classList.contains('open')) {
-        hamburger.style.display = 'none';
-        closeIcon.style.display = 'block';
-    } else {
-        hamburger.style.display = 'flex';
-        closeIcon.style.display = 'none';
-    }
-}
-
-// Function to handle redirects - moved to global scope
-function redirectTo(page) {
-    window.location.href = page;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    // -------------------- MAIN EVENT SLIDER --------------------
-    let slideIndexMain = 0;
-    const slidesMain = document.querySelectorAll(".slide-main");
-    const dotsMain = document.querySelectorAll(".dot-main");
-
-    // Prevent running if no slides found
-    if (slidesMain.length === 0) return;
-
-    function showMainSlide(index) {
-        if (index >= slidesMain.length) index = 0;
-        if (index < 0) index = slidesMain.length - 1;
-
-        slidesMain.forEach(slide => slide.classList.remove("active-slide"));
-        dotsMain.forEach(dot => dot.classList.remove("active-dot"));
-
-        slidesMain[index].classList.add("active-slide");
-
-        // Only add dot class if it exists
-        if (dotsMain[index]) dotsMain[index].classList.add("active-dot");
-
-        slideIndexMain = index;
-    }
-
-    function nextMainSlide() {
-        showMainSlide(slideIndexMain + 1);
-    }
-
-    function prevMainSlide() {
-        showMainSlide(slideIndexMain - 1);
-    }
-
-    // Arrow buttons
-    const leftArrow = document.querySelector(".left-arrow-main");
-    const rightArrow = document.querySelector(".right-arrow-main");
-
-    if (leftArrow) leftArrow.addEventListener("click", prevMainSlide);
-    if (rightArrow) rightArrow.addEventListener("click", nextMainSlide);
-
-    // Dots navigation
-    dotsMain.forEach((dot, i) => dot.addEventListener("click", () => showMainSlide(i)));
-
-    // Auto-slide every 5 seconds
-    let autoSlideMain = setInterval(nextMainSlide, 3000);
-
-    // Pause on hover
-    const mainSlider = document.querySelector(".main-event-slider");
-    if (mainSlider) {
-        mainSlider.addEventListener("mouseover", () => clearInterval(autoSlideMain));
-        mainSlider.addEventListener("mouseout", () => autoSlideMain = setInterval(nextMainSlide, 3000));
-    }
-
-    // Initialize first slide
-    showMainSlide(slideIndexMain);
-
-    // -------------------- TECHNICAL / NON-TECHNICAL SLIDERS --------------------
-    function slide(id, direction) {
-        const slider = document.getElementById(id);
-        if (!slider) return;
-        const scrollAmount = slider.clientWidth * 0.8;
-        slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-    }
-});
-
-
-        // Function to toggle the side menu
+    <script>
+        // Function to toggle the side menu (globally accessible)
         function toggleMenu() {
             const sideMenu = document.getElementById('sideMenu');
             const hamburger = document.getElementById('hamburger');
             const closeIcon = document.getElementById('closeIcon');
-    
-            // Toggle side menu visibility
+
             sideMenu.classList.toggle('open');
-    
-            // Toggle visibility of hamburger and close icon
+
             if (sideMenu.classList.contains('open')) {
                 hamburger.style.display = 'none';
                 closeIcon.style.display = 'block';
@@ -451,86 +352,145 @@ document.addEventListener("DOMContentLoaded", function () {
                 closeIcon.style.display = 'none';
             }
         }
-    
 
-    
-        // Add ripple effect to header, footer, and side menu
-
-        
-function registerForEvent(eventId) {
-    console.log("Starting event registration...");
-
-    fetch('/api/events/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ eventId })
-    })
-    .then(async response => {
-        console.log("Response received:", response.status);
-        
-        if (response.status === 401) {
-            window.location.href = '/login.html';
+        // Function to handle redirects (globally accessible)
+        function redirectTo(page) {
+            window.location.href = page;
         }
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Unknown error");
+        // FIX: The slide function is now in the global scope so onclick can access it
+        function slide(id, direction) {
+            const slider = document.getElementById(id);
+            if (!slider) return;
+            const scrollAmount = slider.clientWidth * 0.8;
+            slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
 
-        return response.json();
-    })
-    .then(result => {
-        console.log("Registration successful:", result);
-        alert('Event registered successfully!');
+        document.addEventListener("DOMContentLoaded", function () {
+            // -------------------- MAIN EVENT SLIDER --------------------
+            let slideIndexMain = 0;
+            const slidesMain = document.querySelectorAll(".slide-main");
+            const dotsMain = document.querySelectorAll(".dot-main");
 
-        // ✅ Set a flag in localStorage so profile.html can detect and update events
-        localStorage.setItem("updateEvents", "true");
+            // Prevent running if no slides found
+            if (slidesMain.length === 0) return;
 
-        // Redirect user to profile page where updateRegisteredEvents() is defined
-        window.location.href = "/profile.html";
-    })
-    .catch(error => {
-        console.error("Error occurred:", error);
-        alert(error.message || "An error occurred. Please try again.");
-    });
-}
+            function showMainSlide(index) {
+                if (index >= slidesMain.length) index = 0;
+                if (index < 0) index = slidesMain.length - 1;
 
-document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+                slidesMain.forEach(slide => slide.classList.remove("active-slide"));
+                // The dots were not being created, so this part is commented out for now.
+                // dotsMain.forEach(dot => dot.classList.remove("active-dot"));
 
-async function checkAuth(event) {
-    event.preventDefault();
-    
-    try {
-        const response = await fetch("/api/user/check-auth", {
-            method: "GET",
-            credentials: "include"
+                slidesMain[index].classList.add("active-slide");
+
+                // if (dotsMain[index]) dotsMain[index].classList.add("active-dot");
+
+                slideIndexMain = index;
+            }
+
+            function nextMainSlide() {
+                showMainSlide(slideIndexMain + 1);
+            }
+
+            function prevMainSlide() {
+                showMainSlide(slideIndexMain - 1);
+            }
+
+            // Arrow buttons
+            const leftArrow = document.querySelector(".left-arrow-main");
+            const rightArrow = document.querySelector(".right-arrow-main");
+
+            if (leftArrow) leftArrow.addEventListener("click", prevMainSlide);
+            if (rightArrow) rightArrow.addEventListener("click", nextMainSlide);
+
+            // Dots navigation
+            // This section is commented out because the dots are not present in the HTML.
+            // dotsMain.forEach((dot, i) => dot.addEventListener("click", () => showMainSlide(i)));
+
+            // Auto-slide every 3 seconds
+            let autoSlideMain = setInterval(nextMainSlide, 3000);
+
+            // Pause on hover
+            const mainSlider = document.querySelector(".main-event-slider");
+            if (mainSlider) {
+                mainSlider.addEventListener("mouseover", () => clearInterval(autoSlideMain));
+                mainSlider.addEventListener("mouseout", () => autoSlideMain = setInterval(nextMainSlide, 3000));
+            }
+
+            // Initialize first slide
+            showMainSlide(slideIndexMain);
         });
 
-        if (response.ok) {
-            window.location.href = "/profile.html";
-        } else {
-            alert("Login first!");
-            window.location.href = "/login.html";
+        function registerForEvent(eventId) {
+            console.log("Starting event registration...");
+
+            fetch('/api/events/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ eventId })
+            })
+            .then(async response => {
+                console.log("Response received:", response.status);
+                
+                if (response.status === 401) {
+                    window.location.href = '/login.html';
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Unknown error");
+                }
+
+                return response.json();
+            })
+            .then(result => {
+                console.log("Registration successful:", result);
+                alert('Event registered successfully!');
+
+                localStorage.setItem("updateEvents", "true");
+
+                window.location.href = "/profile.html";
+            })
+            .catch(error => {
+                console.error("Error occurred:", error);
+                alert(error.message || "An error occurred. Please try again.");
+            });
         }
-    } catch (error) {
-        console.error("Error checking authentication:", error);
-        alert("Login first!");
-        window.location.href = "/login.html";
-    }
-}
 
+        document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+        document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
+        async function checkAuth(event) {
+            event.preventDefault();
+            
+            try {
+                const response = await fetch("/api/user/check-auth", {
+                    method: "GET",
+                    credentials: "include"
+                });
 
-document.querySelector('.logo').addEventListener('click', function() {
-    window.location.href = 'index.html';
-  });
+                if (response.ok) {
+                    window.location.href = "/profile.html";
+                } else {
+                    alert("Login first!");
+                    window.location.href = "/login.html";
+                }
+            } catch (error) {
+                console.error("Error checking authentication:", error);
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        }
 
-    
-</script>
+        document.querySelector('.logo').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
 </body>
 
 </html>
