@@ -1,8 +1,37 @@
 import express from "express";
 import db from "../utils/db.js";
 import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
+import axios from "axios"; // 👈 NEW: Import Axios for HTTP requests
+
 const router = express.Router();
-import nodemailer from "nodemailer";
+
+// Define the URL for your PHP mailer endpoint
+// *** CRITICAL: Update this URL to match your live server/domain ***
+const PHP_MAIL_ENDPOINT = 'https://your-domain.com/public/send_email.php'; 
+
+// Helper function to send email via the external PHP endpoint (Copied from auth.js)
+async function sendEmailViaPhp(to, subject, htmlBody, fromName = "Phantasm Blaze Team") {
+    const emailData = {
+        to: to,
+        subject: subject,
+        html: htmlBody,
+        from_name: fromName 
+    };
+
+    try {
+        const response = await axios.post(PHP_MAIL_ENDPOINT, emailData);
+        console.log("PHP Email Service Response:", response.data);
+        return { success: true, message: response.data.message || "Email request successful." };
+    } catch (error) {
+        const errorMessage = error.response 
+            ? `PHP Error: ${error.response.status} - ${error.response.data.message}`
+            : `Connection Error: ${error.message}`;
+
+        console.error("Error sending email via PHP Endpoint:", errorMessage);
+        return { success: false, message: `Failed to send email. ${errorMessage}` };
+    }
+}
+
 
 // Add this new route below the existing ones in events.js
 router.get("/slots-taken/:eventId", async (req, res) => {
@@ -134,7 +163,10 @@ router.post("/register", requireAuth, async (req, res) => {
         const [user] = await db.query("SELECT name, email, qr_code_id FROM users WHERE id = ?", [userId]);
         if (user.length === 0) return res.status(404).json({ error: "User not found!" });
 
-        await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
+        const sendResult = await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
+        if (!sendResult.success) {
+            console.warn(`[Event Reg] Email to ${user[0].email} failed: ${sendResult.message}`);
+        }
 
         return res.status(201).json({ message: "Registration successful!", team: teamMembersString });
 
@@ -144,40 +176,32 @@ router.post("/register", requireAuth, async (req, res) => {
     }
 });
 
+// ❌ OLD Nodemailer function is replaced with new PHP sending logic
 async function sendRegistrationEmail(name, email, qrCodeId, event) {
-    const transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
+    
+    // Format the date for the email content
+    const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
     });
-const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-});
 
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: `You're Officially Registered! 🎉 – ${event.name}`,
-        html: `
-            <p>Dear ${name},</p>
-            <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>! Your registration has been confirmed, and we can’t wait to see you there.</p>
-            <h3>✅ Your Registration Details:</h3>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Event Registered:</strong> ${event.name}</p>
-            <p><strong>user ID:</strong> ${qrCodeId}</p>
-https://phantasm-blaze.onrender.com
-            <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
-            <p>See you soon!</p>
-            <p><strong>Best Regards,</strong></p>
-            <p>Phantasm Blaze Team</p>
-        `,
-    };
+    const htmlBody = `
+        <p>Dear ${name},</p>
+        <p>We’re excited to welcome you to <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong>! Your registration has been confirmed, and we can’t wait to see you there.</p>
+        <h3>✅ Your Registration Details:</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Event Registered:</strong> ${event.name}</p>
+        <p><strong>user ID:</strong> ${qrCodeId}</p>
+        <p>Got questions? Feel free to reach out at phantasmblaze26@gmail.com. Stay updated by visiting https://phantasm-blaze.onrender.com</p>
+        <p>See you soon!</p>
+        <p><strong>Best Regards,</strong></p>
+        <p>Phantasm Blaze Team</p>
+    `;
 
-    await transporter.sendMail(mailOptions);
+    // 🟢 Send email using the shared PHP utility function
+    const subject = `You're Officially Registered! 🎉 – ${event.name}`;
+    return await sendEmailViaPhp(email, subject, htmlBody);
 }
 
 // 🟢 Get All Events (Public Route)
@@ -194,7 +218,6 @@ router.get("/get-events", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch events." });
     }
 });
-
 
 
 export default router;

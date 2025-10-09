@@ -9,13 +9,45 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
+import axios from "axios"; // 👈 New: Import Axios for HTTP requests
 
-// Import the new transporter utility
-import transporter from "../utils/transporter.js";
+// NOTE: The previous Nodemailer and transporter imports are removed.
 
 dotenv.config();
 
 const router = express.Router();
+
+// Define the URL for your PHP mailer endpoint
+// *** CRITICAL: Update this URL to match your live server/domain ***
+const PHP_MAIL_ENDPOINT = 'https://your-domain.com/public/send_email.php'; 
+
+// Helper function to send email via the external PHP endpoint
+async function sendEmailViaPhp(to, subject, htmlBody, fromName = "Phantasm Blaze Team") {
+    const emailData = {
+        to: to,
+        subject: subject,
+        html: htmlBody,
+        // The PHP script uses SMTP_USER as the actual sender.
+        from_name: fromName 
+    };
+
+    try {
+        // Axios automatically sends data as JSON (application/json)
+        const response = await axios.post(PHP_MAIL_ENDPOINT, emailData);
+        
+        console.log("PHP Email Service Response:", response.data);
+        return { success: true, message: response.data.message || "Email request successful." };
+
+    } catch (error) {
+        // Handle PHP endpoint errors or connection issues
+        const errorMessage = error.response 
+            ? `PHP Error: ${error.response.status} - ${error.response.data.message}`
+            : `Connection Error: ${error.message}`;
+
+        console.error("Error sending email via PHP Endpoint:", errorMessage);
+        return { success: false, message: `Failed to send email. ${errorMessage}` };
+    }
+}
 
 // Define file path for the poster
 const posterPath = path.resolve("public", "poster.pdf");
@@ -34,15 +66,23 @@ router.post('/forgot-password', async (req, res) => {
         // Store the token in the database
         await db.query('UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?', [resetToken, expires, email]);
 
-        // Send Email
-        const mailOptions = {
-            from: "your_email@gmail.com", // Hardcoded for this example
-            to: email,
-            subject: 'Password Reset Request',
-            text: `Use the following token to reset your password: ${resetToken}\n\nThis token is valid for 1 hour.`
-        };
+        // Construct HTML body
+        const htmlBody = `
+            <p>You requested a password reset. Use the following token to reset your password:</p>
+            <h3>${resetToken}</h3>
+            <p>This token is valid for 1 hour.</p>
+        `;
 
-        await transporter.sendMail(mailOptions);
+        // 🟢 Send Email via PHP Endpoint
+        const sendResult = await sendEmailViaPhp(
+            email, 
+            'Password Reset Request', 
+            htmlBody
+        );
+
+        if (!sendResult.success) {
+            console.warn(`[Forgot Password] Email to ${email} failed: ${sendResult.message}`);
+        }
 
         res.json({ success: true, message: 'Reset token sent to your email.' });
     } catch (error) {
@@ -77,6 +117,7 @@ router.post('/reset-password', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error, please try again later.' });
     }
 });
+
 const requireAdmin = (req, res, next) => {
     if (!req.user || req.user.role !== "admin") {
         return res.status(403).json({ error: "Forbidden: Admins only" });
@@ -123,10 +164,11 @@ router.post("/register", async (req, res) => {
         if (role === "admin" && admin_key !== process.env.ADMIN_KEY) {
             return res.status(400).json({ error: "Invalid admin key!" });
         }
+        
         const transactionIdRegex = /^\d{12}$/;
         if (!transactionIdRegex.test(transid)) {
-        return res.status(400).json({ error: "Invalid transaction ID!" });
-}
+            return res.status(400).json({ error: "Invalid transaction ID!" });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -156,33 +198,31 @@ router.post("/register", async (req, res) => {
             console.error("Poster file not found:", posterPath);
         }
 
-        const mailOptions = {
-            from: "your_email@gmail.com", // Hardcoded for this example
-            to: email,
-            subject: "Welcome to Phantasm'25! 🎉",
-            html: `
-                <h2>Hello ${name},</h2>
-                <p>Welcome to our symposium! 🎉</p>
-                <p>Your ID: <strong>${qrCodeId}</strong></p>
-                <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
-                <p>Instructions to register for an event:</p>
-                <ul>
-                    <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
-                    <li>Select an event and confirm your participation.</li>
-                </ul>
-                <p>See you at the event! 🥳</p>
-                <p>Best Regards,<br/>Phantasm Team</p>
-            `
-           
-        };
+        const mailHtmlContent = `
+            <h2>Hello ${name},</h2>
+            <p>Welcome to our symposium! 🎉</p>
+            <p>Your ID: <strong>${qrCodeId}</strong></p>
+            <p>We’ve attached the symposium poster with all the details—make sure to check it out!</p>
+            <p>Instructions to register for an event:</p>
+            <ul>
+                <li>Visit our event page: <a href="https://phantasm-blaze.onrender.com/events.html">Register Here</a></li>
+                <li>Select an event and confirm your participation.</li>
+            </ul>
+            <p>See you at the event! 🥳</p>
+            <p>Best Regards,<br/>Phantasm Blaze Team</p>
+        `;
 
-        transporter.sendMail(mailOptions, (err, info) => {
-            if (err) {
-                console.error("Email Sending Error:", err);
-            } else {
-                console.log("Email Sent:", info.response);
-            }
-        });
+        // 🟢 Send Email via PHP Endpoint (Replaces Nodemailer call)
+        const sendResult = await sendEmailViaPhp(
+            email, 
+            "Welcome to Phantasm Blaze! 🎉", 
+            mailHtmlContent
+        );
+
+        if (!sendResult.success) {
+            console.warn(`[Registration] Email to ${email} failed: ${sendResult.message}`);
+            // Note: Registration still succeeds, but log the email failure.
+        }
 
         res.status(201).json({
             message: `${role === "user" ? "User" : "Admin"} registered successfully!`,
