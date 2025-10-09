@@ -28,18 +28,6 @@ const isAlreadyRegistered = async (userId, eventId) => {
     return result.length > 0;
 };
 
-// New Public Route to check registration status
-router.get("/is-registered/:userId/:eventId", async (req, res) => {
-    try {
-        const { userId, eventId } = req.params;
-        const isRegistered = await isAlreadyRegistered(userId, eventId);
-        res.json({ isRegistered });
-    } catch (error) {
-        console.error("Error checking registration status:", error);
-        res.status(500).json({ error: "Failed to check registration status." });
-    }
-});
-
 // Function to check if a user has a single pass and is already registered for an event
 const hasSinglePassRestriction = async (userId) => {
     // 1. Check user's Pass type
