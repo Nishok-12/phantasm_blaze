@@ -1,65 +1,97 @@
 <?php
-// require 'vendor/autoload.php'; if using Composer
+// Note: You must run 'composer require phpmailer/phpmailer' on your PHP server to use this.
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Load the PHPMailer files
-require_once __DIR__ . '/PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/src/Exception.php';
-require_once __DIR__ . '/PHPMailer/src/SMTP.php';
+// --- CRITICAL CONFIGURATION: Retrieve credentials from environment ---
+// These variables must be set in your server's environment (e.g., Render Environment Variables)
+$smtpUser = getenv('EMAIL_USER');
+$smtpPass = getenv('EMAIL_PASS');
 
-// Check if the request method is POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Set static configuration based on Gmail
+const SMTP_HOST = 'smtp.gmail.com';
+const SMTP_PORT = 587; // Use 587 with ENCRYPTION_STARTTLS
 
-    // Get the raw POST data
-    $json_data = file_get_contents("php://input");
-    $data = json_decode($json_data, true);
+// Load Composer's autoloader (Adjust path if necessary)
+require_once __DIR__ . '/vendor/autoload.php';
 
-    // Check if data is valid and required fields are present
-    if (empty($data) || !isset($data['to']) || !isset($data['subject']) || !isset($data['body'])) {
-        http_response_code(400); // Bad Request
-        echo json_encode(['status' => 'error', 'message' => 'Invalid or missing data.']);
-        exit;
-    }
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *'); // Allows Node.js app access
 
-    $to_email = $data['to'];
-    $subject = $data['subject'];
-    $html_body = $data['body'];
+// 1. Basic Request Validation
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    exit;
+}
 
-    $mail = new PHPMailer(true);
+// 2. Check Environment Credentials
+if (!$smtpUser || !$smtpPass) {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Email credentials (EMAIL_USER or EMAIL_PASS) are missing from the environment.']);
+    exit;
+}
 
-    try {
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host       = 'your_smtp_host'; // e.g., 'smtp.gmail.com'
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'your_smtp_username';
-        $mail->Password   = 'your_smtp_password';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // or ENCRYPTION_SMTPS for SSL
-        $mail->Port       = 587; // or 465 for SSL
+// Get JSON data from the request body
+$json_data = file_get_contents("php://input");
+$data = json_decode($json_data, true);
 
-        // Recipients
-        $mail->setFrom('phantasmblaze26@gmail.com', 'Phantasm Blaze Team');
-        $mail->addAddress($to_email);
+// 3. Data Validation
+if (empty($data) || !isset($data['to']) || !isset($data['subject']) || !isset($data['html'])) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid or missing JSON data in request body.']);
+    exit;
+}
 
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $html_body;
-        $mail->CharSet = 'UTF-8';
+$to_email = filter_var($data['to'], FILTER_VALIDATE_EMAIL);
+$subject = filter_var($data['subject'], FILTER_SANITIZE_STRING);
+$html_body = $data['html'];
+$from_name = $data['from_name'] ?? 'Phantasm Blaze Team';
 
-        $mail->send();
-        
-        http_response_code(200);
-        echo json_encode(['status' => 'success', 'message' => 'Email sent successfully.']);
+if (!$to_email) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid recipient email address.']);
+    exit;
+}
 
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"]);
-    }
+$mail = new PHPMailer(true);
 
-} else {
-    http_response_code(405); // Method Not Allowed
-    echo json_encode(['status' => 'error', 'message' => 'Only POST requests are allowed.']);
+try {
+    // Enable debugging (Set to 0 in production)
+    $mail->SMTPDebug  = 0; // Set to 2 for verbose output when debugging
+    $mail->isSMTP();
+    
+    // Set SMTP configuration using environment variables
+    $mail->Host       = SMTP_HOST;
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $smtpUser; // From environment
+    $mail->Password   = $smtpPass; // From environment (MUST be App Password)
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+    $mail->Port       = SMTP_PORT; 
+
+    // Recipients
+    $mail->setFrom($smtpUser, $from_name);
+    $mail->addAddress($to_email);
+
+    // Content
+    $mail->isHTML(true);
+    $mail->Subject = $subject;
+    $mail->Body    = $html_body;
+    $mail->AltBody = strip_tags($html_body); // Plain text fallback
+    $mail->CharSet = 'UTF-8';
+
+    // Attempt to send
+    $mail->send();
+    
+    http_response_code(200);
+    echo json_encode(['status' => 'success', 'message' => 'Email sent via PHP endpoint.']);
+
+} catch (Exception $e) {
+    // Log the detailed error info and return a generic error
+    error_log("PHPMailer Error to {$to_email}: {$mail->ErrorInfo}");
+    
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => "Email failed. Mailer Error: {$mail->ErrorInfo}"]);
 }
 ?>
