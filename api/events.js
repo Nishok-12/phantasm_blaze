@@ -126,7 +126,7 @@ router.post("/register", requireAuth, async (req, res) => {
         await Promise.all(registrationPromises);
 
         // Insert into teams table
-        const teamMembersString = allMembers.join("+");
+        const teamMembersString = allMembers.join(",");
         // ***FIXED: Always insert a team record, even for solo registrations.***
         await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
