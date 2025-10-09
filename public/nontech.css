@@ -277,7 +277,9 @@ footer a {
 }
 
 .event-title {
-    font-family: 'Audiowide', cursive;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     background-color: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
     width: 100%;
@@ -346,7 +348,9 @@ footer a {
     color: white;
     align-content: center;
     font-size: 40px;
-    font-family: 'Audiowide', cursive;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
 }
 
 ol {
@@ -362,7 +366,9 @@ ol {
     color: white;
     font-size: 30px;
     align-content: center;
-    font-family: 'Caudex', serif;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     transform: rotateY(180deg);
     text-align: justify;
 }
@@ -477,6 +483,9 @@ button {
     color: var(--glow-color);
     font-size: 15px;
     font-weight: bold;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     background-color: var(--btn-color);
     border-radius: 1em;
     outline: none;
@@ -519,7 +528,9 @@ button:active {
 .box .ed ol li {
     font-size: 15px;
     color: #ffffff;
-    font-family: 'Caudex', serif;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     line-height: 1.6;
     margin-bottom: 8px;
     margin-right: 30px;
@@ -622,7 +633,9 @@ a:hover {
 
 .rules-box {
     color: white;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "New Rocker", system-ui;
+  font-weight: 400;
+  font-style: normal;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
