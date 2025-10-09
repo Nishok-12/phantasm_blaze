@@ -1,7 +1,7 @@
 // ============================
 // GLOBAL DATE FOR MAIN EVENT COUNTDOWN
 // ============================
-const EVENT_DATE = new Date("October 30, 2025 00:00:00").getTime();
+const EVENT_DATE = new Date("October 30, 2025 10:00:00").getTime();
 
 
 // ============================
