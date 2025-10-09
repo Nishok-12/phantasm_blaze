@@ -53,7 +53,7 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
         secure: false, // use false for STARTTLS; true for SSL on port 465
         auth: {
             user: 'phantasmblaze26@gmail.com',
-            pass: 'yxxx esri ofsq nmmz',
+            pass: 'yxxxesriofsqnmmz',
         }
     });
 
@@ -221,3 +221,4 @@ router.get("/get-events", async (req, res) => {
 });
 
 export default router;
+
