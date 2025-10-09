@@ -11,6 +11,8 @@ import userRouter from './user.js';
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { requireAuth } from "../middleware.js";
+// FIX: Add axios import to explicitly declare dependency usage
+import axios from "axios"; 
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -76,7 +78,7 @@ app.get("/test-db", async (req, res) => {
     } catch (err) {
         console.error("[DB] Database query error:", err);
         res.status(500).json({ error: "Database error!" });
-   }
+   }
 });
 
 console.log("[DEBUG] Checking Database Connection State:", db);
@@ -84,12 +86,12 @@ console.log("[DEBUG] Checking Database Connection State:", db);
 
 // FIX: This explicit route will now be served for the root, ensuring 'blaze_pre.html' opens first.
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "blaze_pre.html"));
+  res.sendFile(path.join(__dirname, "public", "blaze_pre.html"));
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
 
 export default app;
