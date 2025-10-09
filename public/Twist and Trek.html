@@ -87,7 +87,7 @@
         }
     }
 
-    // Event Registration Function (Requires Login)
+    // ✅ Modified Event Registration Function
     async function registerForEvent(eventId) {
         console.log("Starting event registration...");
 
@@ -155,84 +155,7 @@
         }
     }
 
-
-    // FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING (DOES NOT REQUIRE LOGIN)
-    async function fetchSlotsRemaining() {
-        const eventId = 8; // Event ID for Twist and Trek
-        const totalSlots = 8; // Define the maximum capacity for this event
-        const registerButton = document.querySelector('.register-button');
-
-        try {
-            // This fetch call is public and does not rely on authentication
-            const response = await fetch(`/api/events/slots-taken/${eventId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch slots data.');
-            }
-            const data = await response.json();
-            const slotsTaken = data.slotsTaken;
-            const remaining = totalSlots - slotsTaken;
-
-            document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
-
-            // Disable button if no slots are remaining
-            if (remaining <= 0) {
-                registerButton.disabled = true;
-                registerButton.textContent = "SLOTS FULL";
-                registerButton.style.backgroundColor = "#999"; 
-                registerButton.style.cursor = "not-allowed"; 
-            }
-        } catch (error) {
-            console.error("Error fetching slots:", error);
-            document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
-            // Disable button if fetching failed (due to network/server error)
-            registerButton.disabled = true;
-            registerButton.textContent = "UNAVAILABLE";
-            registerButton.style.backgroundColor = "#999";
-            registerButton.style.cursor = "not-allowed";
-        }
-    }
-    
-    // Check if the user is already registered for this event
-    async function checkRegistrationStatus() {
-        const registerButton = document.querySelector('.register-button');
-        const eventId = 8;
-
-        try {
-            const userResponse = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
-
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                const userId = userData.userId;
-
-                // Check registration status via a new or existing API endpoint
-                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
-
-                if (registrationResponse.ok) {
-                    const registrationData = await registrationResponse.json();
-                    if (registrationData.isRegistered) {
-                        registerButton.disabled = true;
-                        registerButton.textContent = "ALREADY REGISTERED";
-                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
-                        registerButton.style.cursor = "not-allowed";
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error checking registration status:", error);
-        }
-    }
-
-
-    // Call the functions when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchSlotsRemaining();
-        checkRegistrationStatus();
-    });
-
-    // Profile Link Auth Check
+    // ✅ Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
     document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
@@ -258,12 +181,47 @@
         }
     }
 
-    // Click logo to return to home
+    // ✅ Click logo to return to home
     document.querySelector('.logo').addEventListener('click', function() {
         window.location.href = 'index.html';
     });
 
-    
+    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
+    async function fetchSlotsRemaining() {
+        const eventId = 8; // Query Quest's event ID
+        const totalSlots = 8; // Based on the rules for Query Quest (individual event)
+        const registerButton = document.querySelector('.register-button');
+
+        try {
+            const response = await fetch(`/api/events/slots-taken/${eventId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch slots data.');
+            }
+            const data = await response.json();
+            const slotsTaken = data.slotsTaken;
+            const remaining = totalSlots - slotsTaken;
+
+            document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
+
+            // ✅ NEW: Disable button if no slots are remaining
+            if (remaining <= 0) {
+                registerButton.disabled = true;
+                registerButton.textContent = "SLOTS FULL";
+                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
+                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
+            }
+        } catch (error) {
+            console.error("Error fetching slots:", error);
+            document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
+            registerButton.disabled = true;
+            registerButton.textContent = "UNAVAILABLE";
+            registerButton.style.backgroundColor = "#999";
+            registerButton.style.cursor = "not-allowed";
+        }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', fetchSlotsRemaining);
 
 </script>
         <footer>

@@ -25,6 +25,7 @@
             <a href="login.html">Login</a>
         </nav>
         <div class="side-menu" id="sideMenu">
+            <!-- Example folder-based links -->
             <a href="index.html">Home</a>
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
@@ -64,8 +65,8 @@
                 </div>
             </div>
 
-            
-<button class="register-button" onclick="registerForEvent(1)" >REGISTER NOW</button>
+           
+ <button class="register-button" onclick="registerForEvent(1)" >REGISTER NOW</button>
 
             </div>
         </div>
@@ -156,45 +157,6 @@
             alert(error.message || "An error occurred. Please try again.");
         }
     }
-
-    // Check if the user is already registered for this event
-    async function checkRegistrationStatus() {
-        const registerButton = document.querySelector('.register-button');
-        const eventId = 1; // Corrected Event ID for Paper Presentation
-
-        try {
-            const userResponse = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
-
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                const userId = userData.userId;
-
-                // Check registration status via a new or existing API endpoint
-                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
-
-                if (registrationResponse.ok) {
-                    const registrationData = await registrationResponse.json();
-                    if (registrationData.isRegistered) {
-                        registerButton.disabled = true;
-                        registerButton.textContent = "ALREADY REGISTERED";
-                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
-                        registerButton.style.cursor = "not-allowed";
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error checking registration status:", error);
-        }
-    }
-
-    // Call the function when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        checkRegistrationStatus();
-    });
-
 
     // ✅ Profile Link Auth Check
     document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);

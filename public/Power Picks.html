@@ -65,11 +65,11 @@
                                     <li>At last, a list of 11 players must be given with 2 players as captain and vice-captain respectively, where the captain gets an advantage of 2 × points and the vice-captain with 1.5 × points.</li>
                                     <li>The team with the highest cumulative points wins the tournament.</li>
                                 </ol>
-                                 </div>
+                             </div>
                             </div>
                 </div>
             </div>
-<button class="register-button" onclick="registerForEvent(7)" >REGISTER NOW</button>
+ <button class="register-button" onclick="registerForEvent(7)" >REGISTER NOW</button>
             </div>
         </div>
         </div>   
@@ -191,47 +191,13 @@
         window.location.href = 'index.html';
     });
 
-     // Check if the user is already registered for this event
-    async function checkRegistrationStatus() {
-        const registerButton = document.querySelector('.register-button');
-        const eventId = 6; // Corrected Event ID for Pubg or FreeFire
-
-        try {
-            const userResponse = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
-
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                const userId = userData.userId;
-
-                // Check registration status via a new or existing API endpoint
-                const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
-
-                if (registrationResponse.ok) {
-                    const registrationData = await registrationResponse.json();
-                    if (registrationData.isRegistered) {
-                        registerButton.disabled = true;
-                        registerButton.textContent = "ALREADY REGISTERED";
-                        registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
-                        registerButton.style.cursor = "not-allowed";
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error checking registration status:", error);
-        }
-    }
-
-    // FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING (DOES NOT REQUIRE LOGIN)
+    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
     async function fetchSlotsRemaining() {
-        const eventId = 6; // Corrected Event ID for Pubg or FreeFire
-        const totalSlots = 8; // Define the maximum capacity for this event
+        const eventId = 7; // Query Quest's event ID
+        const totalSlots = 8; // Based on the rules for Query Quest (individual event)
         const registerButton = document.querySelector('.register-button');
 
         try {
-            // This fetch call is public and does not rely on authentication
             const response = await fetch(`/api/events/slots-taken/${eventId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch slots data.');
@@ -242,17 +208,16 @@
 
             document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
 
-            // Disable button if no slots are remaining
+            // ✅ NEW: Disable button if no slots are remaining
             if (remaining <= 0) {
                 registerButton.disabled = true;
                 registerButton.textContent = "SLOTS FULL";
-                registerButton.style.backgroundColor = "#999"; 
-                registerButton.style.cursor = "not-allowed"; 
+                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
+                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
             }
         } catch (error) {
             console.error("Error fetching slots:", error);
             document.getElementById('slots-remaining').textContent = `(Error: Slots N/A)`;
-            // Disable button if fetching failed (due to network/server error)
             registerButton.disabled = true;
             registerButton.textContent = "UNAVAILABLE";
             registerButton.style.backgroundColor = "#999";
@@ -260,13 +225,10 @@
         }
     }
 
-    // Call the functions when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchSlotsRemaining();
-        checkRegistrationStatus();
-    });
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', fetchSlotsRemaining);
 
-    </script>
+</script>
         <footer>
             <p>&copy; 2025 CSEA. All rights reserved.</p>
         </footer>

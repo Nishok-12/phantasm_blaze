@@ -25,6 +25,7 @@
             <a href="login.html">Login</a>
         </nav>
         <div class="side-menu" id="sideMenu">
+            <!-- Example folder-based links -->
             <a href="index.html">Home</a>
             <a href="events.html">Events</a>
             <a href="schedule.html">Schedule</a>
@@ -51,19 +52,19 @@
                     <div class="ed">
                         <div class="front">RULES</div>
                         <div class="back"><ol>
-                            <ol type="A">
-                            <li>Each problem will be presented with a unique clue.</li>
-                            <li>The task is to find and write the correct output only.</li>
-                            <li>Answers must be submitted within the given time limit.</li>
-                            <li>Use of external compilers, internet, or AI tools is strictly prohibited.</li>
-                            <li>The participant with the highest score in the least time will be declared the winner.</li> 
-                        </ol>
+                        <ol type="A">
+                        <li>Each problem will be presented with a unique clue.</li>
+                        <li>The task is to find and write the correct output only.</li>
+                        <li>Answers must be submitted within the given time limit.</li>
+                        <li>Use of external compilers, internet, or AI tools is strictly prohibited.</li>
+                        <li>The participant with the highest score in the least time will be declared the winner.</li> 
+                    </ol>
 
                         </div>
                         </div>
                 </div>
             </div>
-<button class="register-button" onclick="registerForEvent(2)" >REGISTER NOW</button>
+ <button class="register-button" onclick="registerForEvent(2)" >REGISTER NOW</button>
 
             </div>
         </div>
@@ -89,119 +90,83 @@
             }
         }
     
+
     
         // Add ripple effect to header, footer, and side menu
-    
+
         
-    function registerForEvent(eventId) {
-        console.log("Starting event registration...");
-    
-        fetch('/api/events/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ eventId })
-        })
-        .then(async response => {
-            console.log("Response received:", response.status);
-            
-            if (response.status === 401) {
-                window.location.href = '/login.html';
-            }
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Unknown error");
-            }
-    
-            return response.json();
-        })
-        .then(result => {
-            console.log("Registration successful:", result);
-            alert('Event registered successfully!');
-    
-            // ✅ Set a flag in localStorage so profile.html can detect and update events
-            localStorage.setItem("updateEvents", "true");
-    
-            // Redirect user to profile page where updateRegisteredEvents() is defined
-            window.location.href = "/profile.html";
-        })
-        .catch(error => {
-            console.error("Error occurred:", error);
-            alert(error.message || "An error occurred. Please try again.");
-        });
-    }
-    
-    // Check if the user is already registered for this event
-        async function checkRegistrationStatus() {
-            const registerButton = document.querySelector('.register-button');
-            const eventId = 2; // Corrected Event ID for CodeCipher
-    
-            try {
-                const userResponse = await fetch("/api/user/check-auth", {
-                    method: "GET",
-                    credentials: "include"
-                });
-    
-                if (userResponse.ok) {
-                    const userData = await userResponse.json();
-                    const userId = userData.userId;
-    
-                    // Check registration status via a new or existing API endpoint
-                    const registrationResponse = await fetch(`/api/events/is-registered/${userId}/${eventId}`);
-    
-                    if (registrationResponse.ok) {
-                        const registrationData = await registrationResponse.json();
-                        if (registrationData.isRegistered) {
-                            registerButton.disabled = true;
-                            registerButton.textContent = "ALREADY REGISTERED";
-                            registerButton.style.backgroundColor = "#4CAF50"; // Optional: change color to green
-                            registerButton.style.cursor = "not-allowed";
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Error checking registration status:", error);
-            }
+function registerForEvent(eventId) {
+    console.log("Starting event registration...");
+
+    fetch('/api/events/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ eventId })
+    })
+    .then(async response => {
+        console.log("Response received:", response.status);
+        
+        if (response.status === 401) {
+            window.location.href = '/login.html';
         }
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        checkRegistrationStatus();
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Unknown error");
+        }
+
+        return response.json();
+    })
+    .then(result => {
+        console.log("Registration successful:", result);
+        alert('Event registered successfully!');
+
+        // ✅ Set a flag in localStorage so profile.html can detect and update events
+        localStorage.setItem("updateEvents", "true");
+
+        // Redirect user to profile page where updateRegisteredEvents() is defined
+        window.location.href = "/profile.html";
+    })
+    .catch(error => {
+        console.error("Error occurred:", error);
+        alert(error.message || "An error occurred. Please try again.");
     });
+}
+
+document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+
+async function checkAuth(event) {
+    event.preventDefault();
     
-    document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
-    document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
-    
-    async function checkAuth(event) {
-        event.preventDefault();
-        
-        try {
-            const response = await fetch("/api/user/check-auth", {
-                method: "GET",
-                credentials: "include"
-            });
-    
-            if (response.ok) {
-                window.location.href = "/profile.html";
-            } else {
-                alert("Login first!");
-                window.location.href = "/login.html";
-            }
-        } catch (error) {
-            console.error("Error checking authentication:", error);
+    try {
+        const response = await fetch("/api/user/check-auth", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            window.location.href = "/profile.html";
+        } else {
             alert("Login first!");
             window.location.href = "/login.html";
         }
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+        alert("Login first!");
+        window.location.href = "/login.html";
     }
-    
-    
-    
-    document.querySelector('.logo').addEventListener('click', function() {
-        window.location.href = 'index.html';
-      });
-    
+}
+
+
+
+document.querySelector('.logo').addEventListener('click', function() {
+    window.location.href = 'index.html';
+  });
+
     </script>
         <footer>
             <p>&copy; 2025 CSEA. All rights reserved.</p>
