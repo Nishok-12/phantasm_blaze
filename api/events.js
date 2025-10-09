@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Define the URL for your PHP mailer endpoint
 // *** CRITICAL: Update this URL to match your live server/domain ***
-const PHP_MAIL_ENDPOINT = 'https://your-domain.com/public/send_email.php'; 
+const PHP_MAIL_ENDPOINT = 'https://phantasm-blaze.onrender.com/public/send_email.php'; 
 
 // Helper function to send email via the external PHP endpoint (Copied from auth.js)
 async function sendEmailViaPhp(to, subject, htmlBody, fromName = "Phantasm Blaze Team") {
