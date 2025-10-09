@@ -123,6 +123,10 @@ router.post("/register", async (req, res) => {
         if (role === "admin" && admin_key !== process.env.ADMIN_KEY) {
             return res.status(400).json({ error: "Invalid admin key!" });
         }
+        const transactionIdRegex = /^\d{12}$/;
+        if (!transactionIdRegex.test(transid)) {
+        return res.status(400).json({ error: "Invalid transaction ID!" });
+}
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
