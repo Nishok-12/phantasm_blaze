@@ -1,13 +1,12 @@
 import express from "express";
 import db from "../utils/db.js";
-import { requireAuth } from "./middleware.js"; // Correct import of requireAuth
-import nodemailer from "nodemailer"; // 🟢 RESTORED: Use Nodemailer for email sending
+import { requireAuth } from "./middleware.js";
+import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// ❌ REMOVED: PHP_MAIL_ENDPOINT and the sendEmailViaPhp helper function
+// ... (Your existing functions like isAlreadyRegistered, hasSinglePassRestriction, etc.)
 
-// Add this new route below the existing ones in events.js
 router.get("/slots-taken/:eventId", async (req, res) => {
     try {
         const { eventId } = req.params;
@@ -22,7 +21,6 @@ router.get("/slots-taken/:eventId", async (req, res) => {
     }
 });
 
-// Function to check if a user is already registered for a specific event
 const isAlreadyRegistered = async (userId, eventId) => {
     const [result] = await db.query(
         "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
@@ -31,19 +29,14 @@ const isAlreadyRegistered = async (userId, eventId) => {
     return result.length > 0;
 };
 
-// Function to check if a user has a single pass and is already registered for an event
 const hasSinglePassRestriction = async (userId) => {
-    // 1. Check user's Pass type
     const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
     
-    // If user is found and has a 'single' pass
     if (userPass.length > 0 && userPass[0].Pass === 'single') {
-        // 2. Count existing registrations
         const [regCount] = await db.query(
             "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
             [userId]
         );
-        // Return true if they have any existing registrations
         return regCount[0].count > 0;
     }
     return false;
@@ -57,14 +50,12 @@ router.post("/register", requireAuth, async (req, res) => {
     if (!eventId) return res.status(400).json({ error: "Event ID is required!" });
 
     try {
-        // 1. Check if event exists
         const [eventExists] = await db.query(
             "SELECT id, name, date, venue FROM events WHERE id = ?",
             [eventId]
         );
         if (eventExists.length === 0) return res.status(404).json({ error: "Event not found!" });
 
-        // 2. CHECK MAIN USER RESTRICTIONS (Single Pass & Duplicate Registration)
         if (await hasSinglePassRestriction(userId)) {
             return res.status(403).json({ error: "Single Event Pass Holders Can Only Register For One Event." });
         }
@@ -72,7 +63,6 @@ router.post("/register", requireAuth, async (req, res) => {
             return res.status(400).json({ error: "User already registered for this event!" });
         }
         
-        // 3. DETERMINE RULES
         let maxTeammates = 0;
         let allowSolo = true;
         if (eventId === 1) {
@@ -86,7 +76,6 @@ router.post("/register", requireAuth, async (req, res) => {
             allowSolo = true;
         }
 
-        // 4. VALIDATE TEAMMATE INPUTS
         const processedTeammates = teammates.map(t => t === "0" ? 0 : parseInt(String(t).replace(/\D/g, "")));
         const validTeammates = processedTeammates.filter(t => t !== 0);
 
@@ -105,7 +94,6 @@ router.post("/register", requireAuth, async (req, res) => {
         if (processedTeammates.some(t => isNaN(t))) 
             return res.status(400).json({ error: "Invalid teammate ID format!" });
 
-        // 5. CHECK TEAMMATE RESTRICTIONS (Single Pass & Duplicate Registration)
         for (const t of validTeammates) {
             if (await hasSinglePassRestriction(t)) {
                 return res.status(403).json({ error: `Teammate with ID ${t} has a single event pass and is already registered.` });
@@ -119,24 +107,37 @@ router.post("/register", requireAuth, async (req, res) => {
             }
         }
 
-        // 6. INSERT DATA
         const allMembers = [userId, ...validTeammates];
         const registrationPromises = allMembers.map(memberId =>
             db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [memberId, eventId])
         );
         await Promise.all(registrationPromises);
 
-        // Insert into teams table
         const teamMembersString = allMembers.join(",");
         await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
-        // 7. FINALIZE (Email and Response)
-        const [user] = await db.query("SELECT name, email, qr_code_id FROM users WHERE id = ?", [userId]);
-        if (user.length === 0) return res.status(404).json({ error: "User not found!" });
+        // **7. FINALIZE (Email and Response)**
+        // **NEW LOGIC: Fetch all team members and send a personalized email to each.**
+        const [teamMembersData] = await db.query(
+            "SELECT name, email, qr_code_id FROM users WHERE id IN (?)",
+            [allMembers]
+        );
 
-        const sendResult = await sendRegistrationEmail(user[0].name, user[0].email, user[0].qr_code_id, eventExists[0]);
-        if (sendResult === false) {
-            console.warn(`[Event Reg] Email to ${user[0].email} failed: Could not send email.`);
+        if (teamMembersData.length === 0) {
+            return res.status(404).json({ error: "Team members not found!" });
+        }
+
+        // Loop through each team member and send an email
+        for (const member of teamMembersData) {
+            const sendResult = await sendRegistrationEmail(
+                member.name,
+                member.email,
+                member.qr_code_id,
+                eventExists[0]
+            );
+            if (sendResult === false) {
+                console.warn(`[Event Reg] Email to ${member.email} failed: Could not send email.`);
+            }
         }
 
         return res.status(201).json({ message: "Registration successful!", team: teamMembersString });
@@ -152,8 +153,8 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
     const transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
-            user: process.env.EMAIL_USER, 
-            pass: process.env.EMAIL_PASS,
+            user: "phantasmblaze26@gmail.com",
+            pass: "yxxxesriofsqnmmz", // **IMPORTANT:** Remove spaces from the app password
         },
     });
 
@@ -164,7 +165,7 @@ async function sendRegistrationEmail(name, email, qrCodeId, event) {
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: "phantasmblaze26@gmail.com",
         to: email,
         subject: `You're Officially Registered! 🎉 – ${event.name}`,
         html: `

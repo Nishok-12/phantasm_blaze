@@ -11,24 +11,26 @@ import path from "path";
 import fs from "fs";
 import nodemailer from "nodemailer"; // 🟢 RESTORED: Use Nodemailer
 
+// NOTE: This dotenv call is irrelevant for the email helper functions below,
+// as they are temporarily using hardcoded strings for quick testing.
 dotenv.config();
 
 const router = express.Router();
 
-// ❌ REMOVED: The sendEmailViaPhp helper function
-
 // Helper function to send email for password reset
 async function sendPasswordResetEmail(email, resetToken) {
+    // 🟢 HARDCODED CREDENTIALS FOR TESTING ONLY
     const transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Google App Password
+            user: 'phantasmblaze26@gmail.com',
+            // WARNING: App Passwords usually fail with spaces. Remove spaces for production.
+            pass: 'yxxxesriofsqnmmz', 
         },
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: 'phantasmblaze26@gmail.com',
         to: email,
         subject: 'Password Reset Request',
         html: `
@@ -40,6 +42,7 @@ async function sendPasswordResetEmail(email, resetToken) {
     
     try {
         await transporter.sendMail(mailOptions);
+        console.log(`[Email] Password reset email sent to: ${email}`);
         return true;
     } catch (error) {
         console.error("[Email] Nodemailer Error during password reset:", error);
@@ -49,18 +52,20 @@ async function sendPasswordResetEmail(email, resetToken) {
 
 // Helper function to send registration email with attachment
 async function sendRegistrationEmailWithAttachment(name, email, qrCodeId, posterPath) {
+    // 🟢 HARDCODED CREDENTIALS FOR TESTING ONLY
     const transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Google App Password
+            user: 'phantasmblaze26@gmail.com',
+            // WARNING: App Passwords usually fail with spaces. Remove spaces for production.
+            pass: 'yxxx esri ofsq nmmz', 
         },
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: 'phantasmblaze26@gmail.com',
         to: email,
-        subject: "Welcome to Phantasm'25! 🎉",
+        subject: "Welcome to Phantasm Blaze! 🎉",
         html: `
             <h2>Hello ${name},</h2>
             <p>Welcome to our symposium! 🎉</p>
@@ -72,7 +77,7 @@ async function sendRegistrationEmailWithAttachment(name, email, qrCodeId, poster
                 <li>Select an event and confirm your participation.</li>
             </ul>
             <p>See you at the event! 🥳</p>
-            <p>Best Regards,<br/>Phantasm Team</p>
+            <p>Best Regards,<br/>Phantasm Blaze Team</p>
         `,
         attachments: [
             {
@@ -84,6 +89,7 @@ async function sendRegistrationEmailWithAttachment(name, email, qrCodeId, poster
 
     try {
         await transporter.sendMail(mailOptions);
+        console.log(`[Email] Registration email sent to: ${email}`);
         return true;
     } catch (error) {
         console.error("[Email] Nodemailer Error during registration:", error);
@@ -92,6 +98,7 @@ async function sendRegistrationEmailWithAttachment(name, email, qrCodeId, poster
 }
 
 // Define file path for the poster
+// NOTE: Make sure 'public/poster.pdf' exists in your file system
 const posterPath = path.resolve("public", "poster.pdf");
 
 // Forgot Password Route
@@ -220,6 +227,7 @@ router.post("/register", async (req, res) => {
 
         if (!fs.existsSync(posterPath)) {
             console.error("Poster file not found:", posterPath);
+            // Optionally, continue without attachment if the file is missing
         }
 
         // 🟢 Send registration email using the native Nodemailer function
