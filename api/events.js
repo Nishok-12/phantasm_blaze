@@ -5,63 +5,37 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
-// ✅ GLOBAL TRANSPORTER (reuse for all emails)
+// ✅ Global transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "phantasmblaze26@gmail.com",
-    pass: "yxxxesriofsqnmmz", // App password (no spaces)
+    pass: "yxxxesriofsqnmmz",
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
+  tls: { rejectUnauthorized: false },
 });
 
-// ✅ UTILITY: Check slots taken
-router.get("/slots-taken/:eventId", async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const [result] = await db.query(
-      "SELECT COUNT(*) AS slotsTaken FROM teams WHERE event_id = ?",
-      [eventId]
-    );
-    res.json({ slotsTaken: result[0].slotsTaken });
-  } catch (error) {
-    console.error("Error fetching slots:", error);
-    res.status(500).json({ error: "Failed to fetch slots data." });
-  }
-});
-
-// ✅ UTILITY: Check if user already registered
+// =====================
+// UTILITY FUNCTIONS
+// =====================
 const isAlreadyRegistered = async (userId, eventId) => {
-  const [result] = await db.query(
-    "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
-    [userId, eventId]
-  );
-  return result.length > 0;
+  const [rows] = await db.query("SELECT id FROM registrations WHERE user_id=? AND event_id=?", [userId, eventId]);
+  return rows.length > 0;
 };
 
-// ✅ UTILITY: Check single-pass restriction
 const hasSinglePassRestriction = async (userId) => {
-  const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
-  if (userPass.length > 0 && userPass[0].Pass === 'single') {
-    const [regCount] = await db.query(
-      "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
-      [userId]
-    );
-    return regCount[0].count > 0;
+  const [rows] = await db.query("SELECT Pass FROM users WHERE id=?", [userId]);
+  if (rows.length && rows[0].Pass === "single") {
+    const [count] = await db.query("SELECT COUNT(*) AS cnt FROM registrations WHERE user_id=?", [userId]);
+    return count[0].cnt > 0;
   }
   return false;
 };
 
-/// Send registration email
 const sendRegistrationEmail = async (name, email, qrCodeId, event) => {
   const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: "numeric", month: "long", day: "numeric"
   });
-
   const mailOptions = {
     from: "phantasmblaze26@gmail.com",
     to: email,
@@ -69,24 +43,40 @@ const sendRegistrationEmail = async (name, email, qrCodeId, event) => {
     html: `
       <p>Dear ${name},</p>
       <p>Your registration for <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong> is confirmed.</p>
-      <h3>✅ Details:</h3>
-      <p><strong>Name:</strong> ${name}</p>
       <p><strong>User ID:</strong> ${qrCodeId}</p>
-      <p><strong>Event:</strong> ${event.name}</p>
       <p>Stay updated: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
       <p><strong>Regards,</strong><br/>Phantasm Blaze Team</p>
-    `,
+    `
   };
 
-try {
+  try {
     const info = await transporter.sendMail(mailOptions);
     console.log(`[MAIL SENT ✅] ${email}: ${info.response}`);
     return true;
-  } catch (error) {
-    console.error(`[MAIL ERROR ❌] ${email}:`, error);
+  } catch (err) {
+    console.error(`[MAIL ERROR ❌] ${email}:`, err.message);
     return false;
   }
 };
+
+// =====================
+// ROUTES
+// =====================
+
+// Test email
+router.get("/test-email", async (req, res) => {
+  try {
+    const info = await transporter.sendMail({
+      from: "phantasmblaze26@gmail.com",
+      to: "cyberkingnishok2005@gmail.com",
+      subject: "Test Email ✅",
+      text: "SMTP is working!"
+    });
+    res.json({ success: true, response: info.response });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // POST route to handle event registration
 router.post("/register", requireAuth, async (req, res) => {
