@@ -1,4 +1,4 @@
-// Import required modules
+// -------------------- IMPORTS --------------------
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -16,7 +16,6 @@ const router = express.Router();
 
 /* -------------------- PASSWORD RESET ROUTES -------------------- */
 
-
 // ============================
 // 🔹 FORGOT PASSWORD
 // ============================
@@ -24,7 +23,7 @@ router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
   try {
-    // 1️⃣ Get user by email
+    // 1️⃣ Fetch user by email
     const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
     if (rows.length === 0) {
@@ -41,34 +40,33 @@ router.post("/forgot-password", async (req, res) => {
     // 2️⃣ Generate random 5-character string
     const randomString = crypto.randomBytes(3).toString("hex").slice(0, 5);
 
-    // 3️⃣ Create reset token = phone + randomString
+    // 3️⃣ Form reset token = phone + random string
     const resetToken = `${phone}${randomString}`;
 
-    // 4️⃣ Expiration: 1 hour
+    // 4️⃣ Token expires in 1 hour
     const resetExpires = Date.now() + 60 * 60 * 1000;
 
-    // 5️⃣ Update DB with token + expiry
+    // 5️⃣ Save token & expiry in DB
     await db.query(
       "UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?",
       [resetToken, resetExpires, email]
     );
 
+    // Log for admin/dev visibility
     console.log(`[Forgot Password] Token generated for ${email}: ${resetToken}`);
 
-    // 6️⃣ Respond with only random string & example
+    // 6️⃣ Respond with simple confirmation (no token shown)
     res.json({
       success: true,
-      message: "Reset token generated successfully!",
-      note: "Your reset token = your registered phone number + the following string.",
-      randomString,
-      example: `If your phone number is ${phone} and the string is '${randomString}', enter reset token as: ${phone}${randomString}`,
-      expiresIn: "1 hour",
+      message: "Reset token generated successfully!"
     });
+
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error, please try again later." });
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later."
+    });
   }
 });
 
@@ -79,6 +77,7 @@ router.post("/reset-password", async (req, res) => {
   const { email, resetToken, newPassword } = req.body;
 
   try {
+    // 1️⃣ Verify user and token
     const [rows] = await db.query(
       "SELECT * FROM users WHERE email = ? AND reset_token = ?",
       [email, resetToken]
@@ -90,34 +89,36 @@ router.post("/reset-password", async (req, res) => {
 
     const user = rows[0];
 
-    // ⏰ Check expiry
+    // 2️⃣ Check expiry
     if (Date.now() > user.reset_expires) {
       return res.json({
         success: false,
-        message: "Token expired. Please request a new one.",
+        message: "Token expired. Please request a new one."
       });
     }
 
-    // 🔒 Hash password
-    const bcrypt = await import("bcrypt");
+    // 3️⃣ Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // ✅ Update password and clear reset info
+    // 4️⃣ Update password & clear token info
     await db.query(
       "UPDATE users SET pass = ?, reset_token = NULL, reset_expires = NULL WHERE email = ?",
       [hashedPassword, email]
     );
 
+    console.log(`[Password Reset] ${email} has reset their password successfully.`);
+
     res.json({ success: true, message: "Password reset successful!" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error, please try again later." });
+    console.error("Reset Password Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later."
+    });
   }
 });
 
-
 /* -------------------- ADMIN VALIDATION -------------------- */
-
 const requireAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== "admin") {
     return res.status(403).json({ error: "Forbidden: Admins only" });
@@ -135,7 +136,6 @@ const queryDatabase = async (query, values) => {
 };
 
 /* -------------------- USER REGISTRATION -------------------- */
-
 router.post("/register", async (req, res) => {
   try {
     const {
@@ -154,28 +154,17 @@ router.post("/register", async (req, res) => {
       Pass,
     } = req.body;
 
+    // ✅ Validation
     if (
-      !name ||
-      !college ||
-      !department ||
-      !reg_no ||
-      !year ||
-      !phone ||
-      !email ||
-      !password ||
-      !accommodation ||
-      !role ||
-      !transid ||
-      !Pass
+      !name || !college || !department || !reg_no || !year || !phone ||
+      !email || !password || !accommodation || !role || !transid || !Pass
     ) {
       return res.status(400).json({ error: "All fields are required!" });
     }
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid phone number! Must be 10 digits." });
+      return res.status(400).json({ error: "Invalid phone number! Must be 10 digits." });
     }
 
     if (role === "admin" && admin_key !== process.env.ADMIN_KEY) {
@@ -189,19 +178,14 @@ router.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [existingUser] = await db.query(
-      "SELECT id FROM users WHERE email = ?",
-      [email]
-    );
-
+    const [existingUser] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
     if (existingUser.length > 0) {
-      return res
-        .status(409)
-        .json({ error: "User with this email already exists." });
+      return res.status(409).json({ error: "User with this email already exists." });
     }
 
-    const result = await db.query(
-      `INSERT INTO users (name, college, department, reg_no, year, phone, email, password, accommodation, role, transid, Pass) 
+    // ✅ Insert new user
+    const [result] = await db.query(
+      `INSERT INTO users (name, college, department, reg_no, year, phone, email, password, accommodation, role, transid, Pass)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         name,
@@ -222,30 +206,23 @@ router.post("/register", async (req, res) => {
     const userId = result.insertId;
     const qrCodeId = `PSM_${userId}`;
 
-    await db.query(`UPDATE users SET qr_code_id = ? WHERE id = ?`, [
-      qrCodeId,
-      userId,
-    ]);
+    await db.query("UPDATE users SET qr_code_id = ? WHERE id = ?", [qrCodeId, userId]);
 
     const token = jwt.sign({ email, role }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    // Poster check (optional)
+    // Optional file check
     const posterPath = path.resolve("public", "poster.pdf");
     if (!fs.existsSync(posterPath)) {
       console.warn("Poster file not found:", posterPath);
     }
 
-    // ⚠️ Email sending removed — replaced with console logs
-    console.log(
-      `[Registration] User ${name} (${email}) registered successfully. QR: ${qrCodeId}`
-    );
+    // Log registration
+    console.log(`[Registration] User ${name} (${email}) registered successfully. QR: ${qrCodeId}`);
 
     res.status(201).json({
-      message: `${
-        role === "user" ? "User" : "Admin"
-      } registered successfully!`,
+      message: `${role === "user" ? "User" : "Admin"} registered successfully!`,
       token,
       qr_code_id: qrCodeId,
     });
