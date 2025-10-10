@@ -1,18 +1,18 @@
 // api/email.js
-const nodemailer = require("nodemailer");
-const express = require("express");
+import nodemailer from "nodemailer";
+import express from "express";
 
 const router = express.Router();
 
-export const transporter = nodemailer.createTransport({
-  service: "gmail",
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // false for STARTTLS
   auth: {
-    user: "phantasmblaze26@gmail.com",
-    pass: "yxxxesriofsqnmmz", // Gmail App Password
+    user: "your_email@gmail.com",
+    pass: "your_app_password",
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
+  tls: { rejectUnauthorized: false },
 });
 
 // Email sending route
