@@ -6,14 +6,13 @@ import adminRoutes from "./admin.js";
 import authRoutes from "./auth.js";
 import eventsRoutes from "./events.js";
 import loginRoutes from "./login.js";
-import emailRoutes from "./email.js"; 
 import db from "../utils/db.js";  
 import userRouter from './user.js'; 
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { requireAuth } from "../middleware.js";
 // FIX: Add axios import to explicitly declare dependency usage
-import axios from "axios"; 
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -48,7 +47,6 @@ app.use("/api/events", requireAuth, eventsRoutes);
 app.use("/api/login", loginRoutes);  
 // FIX: Removed requireAuth here, as authentication should be handled on individual user routes (e.g., in user.js)
 app.use("/api/user", userRouter);
-app.use("/api/email", emailRoutes);
 
 // Test database route
 app.get("/test-db", async (req, res) => {

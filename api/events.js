@@ -1,21 +1,8 @@
 import express from "express";
 import db from "../utils/db.js";
 import { requireAuth } from "./middleware.js";
-import nodemailer from "nodemailer";
 
 const router = express.Router();
-
-// ✅ GLOBAL TRANSPORTER (reuse for all emails)
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "phantasmblaze26@gmail.com",
-    pass: "yxxxesriofsqnmmz", // Gmail App Password
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
 
 /* -------------------- UTILITIES -------------------- */
 
@@ -31,7 +18,7 @@ const isAlreadyRegistered = async (userId, eventId) => {
 // Check single-pass restriction
 const hasSinglePassRestriction = async (userId) => {
   const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
-  if (userPass.length > 0 && userPass[0].Pass === 'single') {
+  if (userPass.length > 0 && userPass[0].Pass === "single") {
     const [regCount] = await db.query(
       "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
       [userId]
@@ -39,31 +26,6 @@ const hasSinglePassRestriction = async (userId) => {
     return regCount[0].count > 0;
   }
   return false;
-};
-
-// Send registration email
-const sendRegistrationEmail = async (member, event) => {
-  const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const mailOptions = {
-    from: "phantasmblaze26@gmail.com",
-    to: member.email,
-    subject: `You're Registered! 🎉 – ${event.name}`,
-    html: `
-      <p>Dear ${member.name},</p>
-      <p>Your registration for <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong> is confirmed.</p>
-      <p><strong>User ID:</strong> ${member.qr_code_id}</p>
-      <p><strong>Event:</strong> ${event.name}</p>
-      <p>Stay updated: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
-      <p><strong>Regards,</strong><br/>Phantasm Blaze Team</p>
-    `,
-  };
-
-  await transporter.sendMail(mailOptions);
 };
 
 /* -------------------- ROUTES -------------------- */
@@ -170,17 +132,7 @@ router.post("/register", requireAuth, async (req, res) => {
     const teamMembersString = allTeamMembers.join(",");
     await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
-    // 7️⃣ Send Emails
-    const [teamMembersData] = await db.query(
-      "SELECT name, email, qr_code_id FROM users WHERE id IN (?)",
-      [allTeamMembers]
-    );
-
-    for (const member of teamMembersData) {
-      try { await sendRegistrationEmail(member, event); }
-      catch (err) { console.warn(`[MAIL ERROR ❌] ${member.email}: ${err.message}`); }
-    }
-
+    // ✅ Registration complete (email removed)
     res.status(201).json({ message: "Registration successful!", team: teamMembersString });
   } catch (error) {
     console.error("Registration error:", error);
