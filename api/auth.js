@@ -19,11 +19,13 @@ const router = express.Router();
 // ============================
 // 🔹 FORGOT PASSWORD
 // ============================
+// ============================
+// 🔹 FORGOT PASSWORD
+// ============================
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
   try {
-    // 1️⃣ Fetch user by email
     const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
     if (rows.length === 0) {
@@ -37,35 +39,36 @@ router.post("/forgot-password", async (req, res) => {
       return res.json({ success: false, message: "Phone number not found for this account." });
     }
 
-    // 2️⃣ Generate random 5-character string
+    // Generate random 5-character string
     const randomString = crypto.randomBytes(3).toString("hex").slice(0, 5);
 
-    // 3️⃣ Form reset token = phone + random string
+    // Create reset token = phone + random string
     const resetToken = `${phone}${randomString}`;
 
-    // 4️⃣ Token expires in 1 hour
+    // Expiry = 1 hour
     const resetExpires = Date.now() + 60 * 60 * 1000;
 
-    // 5️⃣ Save token & expiry in DB
     await db.query(
       "UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?",
       [resetToken, resetExpires, email]
     );
 
-    // Log for admin/dev visibility
     console.log(`[Forgot Password] Token generated for ${email}: ${resetToken}`);
 
-    // 6️⃣ Respond with simple confirmation (no token shown)
+    // ✅ Popup message is short; detailed info goes to message div
     res.json({
       success: true,
-      message: "Reset token generated successfully!"
+      message: "Reset token generated successfully!",
+      note: "Your reset token = your registered phone number + the following string.",
+      randomString,
+      example: `If your phone number is ${phone} and the string is '${randomString}', enter reset token as: ${resetToken}`,
+      expiresIn: "1 hour",
     });
-
   } catch (error) {
-    console.error("Forgot Password Error:", error);
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: "Server error, please try again later."
+      message: "Server error, please try again later.",
     });
   }
 });
