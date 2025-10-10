@@ -2,81 +2,68 @@ import express from "express";
 import db from "../utils/db.js";
 import { requireAuth } from "./middleware.js";
 import nodemailer from "nodemailer";
+import axios from "axios";
 
 const router = express.Router();
 
-// ✅ Global transporter
+// ✅ GLOBAL TRANSPORTER (reuse for all emails)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "phantasmblaze26@gmail.com",
-    pass: "yxxxesriofsqnmmz",
+    pass: "yxxxesriofsqnmmz", // App password (no spaces)
   },
-  tls: { rejectUnauthorized: false },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
-// =====================
-// UTILITY FUNCTIONS
-// =====================
+// ✅ UTILITY: Check slots taken
+router.get("/slots-taken/:eventId", async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const [result] = await db.query(
+      "SELECT COUNT(*) AS slotsTaken FROM teams WHERE event_id = ?",
+      [eventId]
+    );
+    res.json({ slotsTaken: result[0].slotsTaken });
+  } catch (error) {
+    console.error("Error fetching slots:", error);
+    res.status(500).json({ error: "Failed to fetch slots data." });
+  }
+});
+
+// ✅ UTILITY: Check if user already registered
 const isAlreadyRegistered = async (userId, eventId) => {
-  const [rows] = await db.query("SELECT id FROM registrations WHERE user_id=? AND event_id=?", [userId, eventId]);
-  return rows.length > 0;
+  const [result] = await db.query(
+    "SELECT id FROM registrations WHERE user_id = ? AND event_id = ?",
+    [userId, eventId]
+  );
+  return result.length > 0;
 };
 
+// ✅ UTILITY: Check single-pass restriction
 const hasSinglePassRestriction = async (userId) => {
-  const [rows] = await db.query("SELECT Pass FROM users WHERE id=?", [userId]);
-  if (rows.length && rows[0].Pass === "single") {
-    const [count] = await db.query("SELECT COUNT(*) AS cnt FROM registrations WHERE user_id=?", [userId]);
-    return count[0].cnt > 0;
+  const [userPass] = await db.query("SELECT Pass FROM users WHERE id = ?", [userId]);
+  if (userPass.length > 0 && userPass[0].Pass === 'single') {
+    const [regCount] = await db.query(
+      "SELECT COUNT(*) AS count FROM registrations WHERE user_id = ?",
+      [userId]
+    );
+    return regCount[0].count > 0;
   }
   return false;
 };
 
+/// Send registration email
 const sendRegistrationEmail = async (name, email, qrCodeId, event) => {
   const formattedDate = new Date(event.date).toLocaleDateString("en-IN", {
-    year: "numeric", month: "long", day: "numeric"
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
-  const mailOptions = {
-    from: "phantasmblaze26@gmail.com",
-    to: email,
-    subject: `You're Registered! 🎉 – ${event.name}`,
-    html: `
-      <p>Dear ${name},</p>
-      <p>Your registration for <strong>${event.name}</strong> on <strong>${formattedDate}</strong> at <strong>${event.venue}</strong> is confirmed.</p>
-      <p><strong>User ID:</strong> ${qrCodeId}</p>
-      <p>Stay updated: <a href="https://phantasm-blaze.onrender.com">Phantasm Blaze</a></p>
-      <p><strong>Regards,</strong><br/>Phantasm Blaze Team</p>
-    `
-  };
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[MAIL SENT ✅] ${email}: ${info.response}`);
-    return true;
-  } catch (err) {
-    console.error(`[MAIL ERROR ❌] ${email}:`, err.message);
-    return false;
-  }
 };
-
-// =====================
-// ROUTES
-// =====================
-
-// Test email
-router.get("/test-email", async (req, res) => {
-  try {
-    const info = await transporter.sendMail({
-      from: "phantasmblaze26@gmail.com",
-      to: "cyberkingnishok2005@gmail.com",
-      subject: "Test Email ✅",
-      text: "SMTP is working!"
-    });
-    res.json({ success: true, response: info.response });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
 
 // POST route to handle event registration
 router.post("/register", requireAuth, async (req, res) => {
@@ -159,35 +146,35 @@ router.post("/register", requireAuth, async (req, res) => {
         const teamMembersString = allMembers.join(",");
         await db.query("INSERT INTO teams (event_id, members) VALUES (?, ?)", [eventId, teamMembersString]);
 
-        // 7. FINALIZE (Email and Response)
-        const [teamMembersData] = await db.query(
-            "SELECT name, email, qr_code_id FROM users WHERE id IN (?)",
-            [allMembers]
-        );
+        // ✅ Send Email
+    const [teamMembersData] = await db.query(
+  "SELECT name, email, qr_code_id FROM users WHERE id IN (?)",
+  [allMembers]
+);
 
-        if (teamMembersData.length === 0) {
-            return res.status(404).json({ error: "Team members not found!" });
-        }
 
-        // Loop through each team member and send an email
-        for (const member of teamMembersData) {
-            const sendResult = await sendRegistrationEmail(
-                member.name,
-                member.email,
-                member.qr_code_id,
-                eventExists[0]
-            );
-            if (sendResult === false) {
-                console.warn(`[Event Reg] Email to ${member.email} failed: Could not send email.`);
-            }
-        }
-
-        return res.status(201).json({ message: "Registration successful!", team: teamMembersString });
-
-    } catch (error) {
-        console.error("Database error:", error);
-        return res.status(500).json({ error: "Database error!", details: error });
+    for (const member of teamMembersData) {
+      try {
+        await axios.post("https://phantasm-blaze.onrender.com/api/email/send-email", {
+          name: member.name,
+          email: member.email,
+          qrCodeId: member.qr_code_id,
+          event: eventExists[0],
+        });
+        console.log(`[Event Reg] Email sent to ${member.email}`);
+      } catch (err) {
+        console.warn(`[Event Reg] Failed to send email to ${member.email}: ${err.message}`);
+      }
     }
+
+    res.status(201).json({
+      message: "Registration successful!",
+      team: teamMembersString,
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Database error!", details: error });
+  }
 });
 
 // 🟢 Get All Events (Public Route)
