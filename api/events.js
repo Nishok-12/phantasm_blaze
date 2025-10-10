@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../utils/db.js";
-import { requireAuth } from "./middleware.js";
+import { requireAuth } from "../middleware.js";
 import axios from "axios";
 
 const router = express.Router();
@@ -77,7 +77,7 @@ router.post("/register", requireAuth, async (req, res) => {
   if (!eventId) return res.status(400).json({ error: "Event ID is required!" });
 
   try {
-    // Validate event existence
+    // ✅ Validate event existence
     const [eventExists] = await db.query(
       "SELECT id, name, date, venue FROM events WHERE id = ?",
       [eventId]
@@ -85,21 +85,22 @@ router.post("/register", requireAuth, async (req, res) => {
     if (eventExists.length === 0)
       return res.status(404).json({ error: "Event not found!" });
 
-    // 1️⃣ Check pass restrictions
+    // ✅ 1️⃣ Check pass restrictions
     if (await hasSinglePassRestriction(userId)) {
       return res.status(403).json({
         error: "Single Event Pass Holders Can Only Register For One Event.",
       });
     }
 
-    // 2️⃣ Already registered check
+    // ✅ 2️⃣ Already registered check
     if (await isAlreadyRegistered(userId, eventId)) {
       return res.status(400).json({ error: "User already registered!" });
     }
 
-    // 3️⃣ Event team logic
+    // ✅ 3️⃣ Define event team rules
     let maxTeammates = 0;
     let allowSolo = true;
+
     if (eventId === 1) {
       maxTeammates = 1;
       allowSolo = true;
@@ -111,7 +112,7 @@ router.post("/register", requireAuth, async (req, res) => {
       allowSolo = true;
     }
 
-    // 4️⃣ Validate teammates
+    // ✅ 4️⃣ Validate teammates
     const processedTeammates = teammates.map((t) =>
       t === "0" ? 0 : parseInt(String(t).replace(/\D/g, ""))
     );
@@ -132,7 +133,7 @@ router.post("/register", requireAuth, async (req, res) => {
         .status(400)
         .json({ error: "All teammates are required for this event." });
 
-    // 5️⃣ Validate teammates existence and eligibility
+    // ✅ 5️⃣ Validate teammates existence and eligibility
     for (const t of validTeammates) {
       if (await hasSinglePassRestriction(t)) {
         return res.status(403).json({
@@ -152,7 +153,7 @@ router.post("/register", requireAuth, async (req, res) => {
       }
     }
 
-    // 6️⃣ Register all members
+    // ✅ 6️⃣ Register all members
     const registrationPromises = allTeamMembers.map((memberId) =>
       db.query("INSERT INTO registrations (user_id, event_id) VALUES (?, ?)", [
         memberId,
@@ -167,7 +168,7 @@ router.post("/register", requireAuth, async (req, res) => {
       teamMembersString,
     ]);
 
-    // 7️⃣ Send email notifications
+    // ✅ 7️⃣ Send email notifications
     const [teamMembersData] = await db.query(
       "SELECT name, email, qr_code_id FROM users WHERE id IN (?)",
       [allTeamMembers]
@@ -181,9 +182,9 @@ router.post("/register", requireAuth, async (req, res) => {
           qrCodeId: member.qr_code_id,
           event: eventExists[0],
         });
-        console.log(`[Email] Sent to ${member.email}`);
+        console.log(`[📧 Email] Sent to ${member.email}`);
       } catch (err) {
-        console.warn(`[Email] Failed for ${member.email}: ${err.message}`);
+        console.warn(`[⚠️ Email] Failed for ${member.email}: ${err.message}`);
       }
     }
 
@@ -193,7 +194,7 @@ router.post("/register", requireAuth, async (req, res) => {
       team: teamMembersString,
     });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("❌ Registration error:", error);
     res.status(500).json({ error: "Server error", details: error.message });
   }
 });
