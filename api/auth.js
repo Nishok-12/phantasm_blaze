@@ -61,7 +61,7 @@ router.post("/forgot-password", async (req, res) => {
       message: "Reset token generated successfully!",
       note: "Your reset token = your registered phone number + the following string.",
       randomString,
-      example: `If your phone number is ${phone} and the string is '${randomString}', enter reset token as: ${resetToken}`,
+      example: `If your phone number is 1234567890 and the string is 'abcde', enter reset token as: 1234567890abcde`,
       expiresIn: "1 hour",
     });
   } catch (error) {
@@ -77,48 +77,39 @@ router.post("/forgot-password", async (req, res) => {
 // 🔹 RESET PASSWORD
 // ============================
 router.post("/reset-password", async (req, res) => {
-  const { email, resetToken, newPassword } = req.body;
+    const { email, resetToken, newPassword } = req.body;
 
-  try {
-    // 1️⃣ Verify user and token
-    const [rows] = await db.query(
-      "SELECT * FROM users WHERE email = ? AND reset_token = ?",
-      [email, resetToken]
-    );
+    try {
+        // 1️⃣ Verify user and token & check for expiry in a single query
+        const [rows] = await db.query(
+            "SELECT * FROM users WHERE email = ? AND reset_token = ? AND reset_expires > ?",
+            [email, resetToken, Date.now()]
+        );
 
-    if (rows.length === 0) {
-      return res.json({ success: false, message: "Invalid token or email." });
+        if (rows.length === 0) {
+            // This now handles invalid token/email AND expired tokens
+            return res.json({ success: false, message: "Invalid token, email, or token has expired." });
+        }
+
+        // 2️⃣ Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // 3️⃣ Update password & clear token info
+        await db.query(
+            "UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE email = ?",
+            [hashedPassword, email]
+        );
+
+        console.log(`[Password Reset] ${email} has reset their password successfully.`);
+
+        res.json({ success: true, message: "Password reset successful!" });
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server error, please try again later."
+        });
     }
-
-    const user = rows[0];
-
-    // 2️⃣ Check expiry
-    if (Date.now() > user.reset_expires) {
-      return res.json({
-        success: false,
-        message: "Token expired. Please request a new one."
-      });
-    }
-
-    // 3️⃣ Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // 4️⃣ Update password & clear token info
-    await db.query(
-      "UPDATE users SET pass = ?, reset_token = NULL, reset_expires = NULL WHERE email = ?",
-      [hashedPassword, email]
-    );
-
-    console.log(`[Password Reset] ${email} has reset their password successfully.`);
-
-    res.json({ success: true, message: "Password reset successful!" });
-  } catch (error) {
-    console.error("Reset Password Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error, please try again later."
-    });
-  }
 });
 
 /* -------------------- ADMIN VALIDATION -------------------- */
