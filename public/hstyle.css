@@ -7,7 +7,7 @@ body {
   font-family: "New Rocker", system-ui;
   font-weight: 400;
   font-style: normal;
-  background: #000 url('image/bg-small.jpg') no-repeat center center fixed;
+  background: #000 url('image/bg.png') no-repeat center center fixed;
   background-size: cover;
   color: #fff;
   margin: 0;
