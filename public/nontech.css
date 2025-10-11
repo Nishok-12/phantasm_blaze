@@ -134,6 +134,14 @@ header nav a:hover {
     right: 0;
 }
 
+#highlight{
+    color:red;
+}
+
+#highlight1{
+    color:#a40000;
+}
+
 .ripple {
     position: absolute;
     width: 300px;

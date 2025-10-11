@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
 
 html {
-    background-image: url("conbg.jpg");
+    background-image: url("schbg.jpeg");
     background-size: cover;
 }
 
@@ -82,6 +82,15 @@ header nav a:hover {
     position: relative;
     padding: 10px;
 }
+
+#highlight{
+    color:red;
+}
+
+#highlight1{
+    color:#a40000;
+}
+
 
 .hamburger div {
     width: 25px;

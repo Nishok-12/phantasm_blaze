@@ -26,7 +26,6 @@
         }
 
         header, footer {
-        position: relative;
         background: transparent;
         color: white;
         display: flex;
@@ -125,7 +124,7 @@
         font-family: "New Rocker", system-ui;
   font-weight: 400;
   font-style: normal;
-        position: fixed;
+        position: relative;
         bottom: 0;
         width: 100%;
         color: white;
@@ -235,7 +234,7 @@
 
         .tab th, .tab td {
             padding: 12px;
-            border: 1px solid rgba(149, 39, 68, 0.4);
+            border: 1px solid rgba(243, 169, 189, 0.912);
             text-align: center;
             position: relative;
         }
@@ -250,7 +249,7 @@
 
         .tab td {
             background: rgba(0, 0, 0, 0.6);
-            color: #ae373f;
+            color: #fff;
             font-size: 15px;
             transition: all 0.4s ease-in-out;
         }
@@ -260,14 +259,7 @@
             transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
 
-        .tab tr:hover {
-            background: rgba(146, 158, 50, 0.3); /* Light neon blue tint */
-            box-shadow: 0px 0px 15px rgba(149, 40, 42, 0.7), 
-                        0px 0px 25px rgba(163, 67, 118, 0.5); /* Outer glow */
-            border-radius: 6px; /* Slightly round the edges */
-            transition: all 0.3s ease-in-out;
-        }
-
+       
         @media (max-width: 768px) {
             #ttop{
                 font-size: 20px;
@@ -355,91 +347,85 @@
 
     <H3 id="ttop">Event Schedule</H3>
     <table class="tab">
-     <tr>
-        <th>Event Name</th>
-        <th>Event Type</th>
-        <th>Venue</th>
-        <th>Date</th>
-        <th>Time</th>
-     </tr>
-     <tr>
-        <td>TechTalk</td>
-        <td>Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-     <tr>
-        <td>CodeCipher</td>
-        <td>Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-     <tr>
-        <td>QueryQuest</td>
-        <td>Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>GenSight</td>
-        <td>Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>CodeVortex</td>
-        <td>Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>PowerPicks</td>
-        <td>Non-Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>Twist and Trek</td>
-        <td>Non-Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>Free Fire</td>
-        <td>Non-Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>PUBG</td>
-        <td>Non-Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
-     <tr>
-        <td>ClueCraze</td>
-        <td>Non-Technical</td>
-        <td>To be Announced</td>
-        <td>30.10.2025</td>
-        <td>To be Announced</td>
-     </tr>
-
+     <thead>
+    <tr>
+      <th>TIME</th>
+      <th>EVENT 1</th>
+      <th>EVENT 2</th>
+      <th>EVENT 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>9.00 - 10.00</td>
+      <td colspan="3">OnSpot Registeration<br><span class="event-venue">(Venue: Targaryenz Classroom)</span></td>
+    </tr>
+    <tr>
+      <td>10.00 - 10.30</td>
+        <td></td><td></td>
+      <td rowspan="6">Paper Presentation<br><span class="event-venue">(Venue: Seminar Hall)</span></td>
+    </tr>
+    <tr>
+      <td>10.30 - 11.00</td>
+      <td rowspan="2">Query Quest<br><span class="event-venue">(Venue: OS Lab)</span></td>
+      <td rowspan="2">Code Cipher<br><span class="event-venue">(Venue: Project Lab)</span></td>
+    </tr>
+    <tr>
+      <td>11.00 - 11.30</td>
+      
+    </tr>
+    <tr>
+      <td>11.30 - 12.00</td>
+      <td rowspan="2">Gen Sight<br><span class="event-venue">(Venue: OS Lab)</span></td>
+      <td rowspan="2">Code Vortex<br><span class="event-venue">(Venue: Project Lab)</span></td>
+    </tr>
+    <tr>
+      <td>12.00 - 12.30</td>
+    </tr>
+    <tr>
+      <td>12.30 - 1.00</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>1.00 - 1.30</td>
+      <td>Free Fire<br><span class="event-venue">(Venue: Targaryenz Classroom)</span></td>
+      <td colspan="2" rowspan="2">Lunch<br><span class="event-venue">(Venue: 2<sup>nd</sup>Year Classroom)</span></td>
+    </tr>
+    <tr>
+      <td>1.30 - 2.00</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2.00 - 2.30</td>
+      <td rowspan="6">Power Pick<br><span class="event-venue">(Venue: Targaryenz Classroom)</span></td>
+      <td rowspan="3">Clue Craze<br><span class="event-venue">(Venue: Seminar Hall)</span></td>
+      <td rowspan="6"></td>
+    </tr>
+    <tr>
+      <td>2.30 - 3.00</td>
+      
+    </tr>
+    <tr>
+      <td>3.00 - 3.30</td>
+        
+    </tr>
+    <tr>
+      <td>3.30 - 4.00</td>
+      <td rowspan="3">Twist & Trek<br><span class="event-venue">(Venue: Azertronz Classroom)</span></td>
+    </tr>
+    <tr>
+      <td>4.00 - 4.30</td>
+    </tr>
+    <tr>
+      <td>4.30 - 5.00</td>
+      
+    </tr>
+    <tr>
+      <td>5.00 - 6.00</td>
+      <td colspan="3">Winners Announcement & Prize Distribution<br>(Venue: Seminar Hall)</td>
+    </tr>
+  </tbody>
     </table>
     <p></p>
     <br>
