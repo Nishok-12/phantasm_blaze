@@ -182,6 +182,43 @@
         }
     }
 
+    // ✅ NEW FUNCTION TO FETCH AND DISPLAY SLOTS REMAINING
+    async function fetchSlotsRemaining() {
+        const eventId = 6; // Query Quest's event ID
+        const totalSlots = 10; // Based on the rules for Query Quest (individual event)
+        const registerButton = document.querySelector('.register-button');
+
+        try {
+            const response = await fetch(`/api/events/slots-taken/${eventId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch slots data.');
+            }
+            const data = await response.json();
+            const slotsTaken = data.slotsTaken;
+            const remaining = totalSlots - slotsTaken;
+
+            document.getElementById('slots-remaining').textContent = `(Slots Remaining: ${remaining})`;
+
+            // ✅ NEW: Disable button if no slots are remaining
+            if (remaining <= 0) {
+                registerButton.disabled = true;
+                registerButton.textContent = "SLOTS FULL";
+                registerButton.style.backgroundColor = "#999"; // Optional: change color to grey
+                registerButton.style.cursor = "not-allowed"; // Optional: change cursor
+            }
+        } catch (error) {
+            console.error("Error fetching slots:", error);
+            document.getElementById('slots-remaining').textContent = `(Error: Login to View Slots)`;
+            registerButton.disabled = true;
+            registerButton.textContent = "UNAVAILABLE";
+            registerButton.style.backgroundColor = "#999";
+            registerButton.style.cursor = "not-allowed";
+        }
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', fetchSlotsRemaining);
+
     // ✅ Click logo to return to home
     document.querySelector('.logo').addEventListener('click', function() {
         window.location.href = 'index.html';
