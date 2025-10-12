@@ -148,7 +148,17 @@ router.post("/register", async (req, res) => {
       Pass,
     } = req.body;
 
-   
+    // ✅ Validation
+    if (role === 'user') {
+  // Regex to ensure the ID is exactly 12 digits
+  if (
+      !name || !college || !department || !reg_no || !year || !phone ||
+      !email || !password || !accommodation || !role || !transid || !Pass
+    ) {
+      return res.status(400).json({ error: "All fields are required!" });
+    }
+  }
+    
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
@@ -159,10 +169,16 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Invalid admin key!" });
     }
 
-    const transactionIdRegex = /^\d{12}$/;
-    if (!transactionIdRegex.test(transid)) {
-      return res.status(400).json({ error: "Invalid transaction ID!" });
-    }
+    // ✅ Only perform this check if the role is 'user' (participant)
+if (role === 'user') {
+  // Regex to ensure the ID is exactly 12 digits
+  const transactionIdRegex = /^\d{12}$/;
+
+  // Check if transid is missing OR if it's not a valid 12-digit string
+  if (!transid || !transactionIdRegex.test(transid)) {
+    return res.status(400).json({ error: "A valid 12-digit transaction ID is required for participants!" });
+  }
+}
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
