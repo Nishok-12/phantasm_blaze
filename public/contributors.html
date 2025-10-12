@@ -1020,52 +1020,65 @@ footer a:hover {
 
         let animation;
 
-        function createSeamlessScroll() {
+        // A function to set up and run the animation
+        function setupAndRunAnimation() {
             const wrapper = document.querySelector(".wrapper");
-            if (animation) animation.kill();
+            if (animation) animation.kill(); // Stop any previous animation
 
-            const originalBoxes = Array.from(wrapper.querySelectorAll(".box:not(.clone)"));
+            // Get all the boxes currently in the wrapper
+            const boxes = Array.from(wrapper.querySelectorAll(".box"));
+            if (boxes.length === 0) return; // Exit if no boxes
+
+            // Calculate the total width of a single set of boxes
+            // We assume the initial HTML contains one full set.
+            const totalWidth = boxes.reduce((acc, box) => acc + box.offsetWidth, 0);
+
+            // Clear any existing clones to handle resizing correctly
+            wrapper.querySelectorAll('.clone').forEach(clone => clone.remove());
             
-            wrapper.innerHTML = "";
-            originalBoxes.forEach(box => {
-                gsap.set(box, { x: 0 });
-                wrapper.appendChild(box);
-            });
+            // Get the original boxes again after clearing clones
+            const originalBoxes = Array.from(wrapper.querySelectorAll(".box"));
 
-            const totalWidth = originalBoxes.reduce((acc, box) => acc + box.offsetWidth, 0);
             const screenWidth = wrapper.offsetWidth;
+            // Calculate how many full sets of clones we need to fill the screen plus one extra
             const clonesNeeded = Math.ceil(screenWidth / totalWidth) + 1;
 
+            // Add the clones to the wrapper
             for (let i = 0; i < clonesNeeded; i++) {
                 originalBoxes.forEach(box => {
                     const clone = box.cloneNode(true);
                     clone.classList.add("clone");
-                    gsap.set(clone, { x: 0 });
                     wrapper.appendChild(clone);
                 });
             }
 
+            // Select all boxes again (originals + new clones)
             const allBoxes = Array.from(wrapper.querySelectorAll(".box"));
             const scrollDistance = totalWidth;
-            const duration = 35; // Increased duration for a slower, smoother scroll
+            const duration = 35; // Adjust for speed
 
+            // GSAP Animation
             animation = gsap.to(allBoxes, {
-                x: `-=${scrollDistance}`, // CRITICAL FIX: Corrected syntax
+                x: `-=${scrollDistance}`, // Move each box left by the width of one full set
                 duration: duration,
                 ease: "none",
-                repeat: -1,
+                repeat: -1, // Loop forever
                 modifiers: {
+                    // This modifier creates the seamless wrap-around effect
                     x: gsap.utils.unitize(x => parseFloat(x) % scrollDistance)
                 }
             });
         }
         
-        createSeamlessScroll();
+        // Initial setup
+        setupAndRunAnimation();
 
+        // Recalculate on window resize
         let resizeTimeout;
         window.addEventListener("resize", () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(createSeamlessScroll, 200);
+            // Debounce the resize event for better performance
+            resizeTimeout = setTimeout(setupAndRunAnimation, 200);
         });
     </script>
 
