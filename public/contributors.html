@@ -727,6 +727,13 @@ footer a:hover {
   color: #000000;
 }
 
+.video-wrapper iframe {
+            /* Applied fixed dimensions for DESKTOP */
+            width: 800px;
+            height: 450px;
+            border-radius: 8px;
+        }
+
 .card:hover {
   box-shadow: 0rem 6px 13px rgba(10, 60, 255, 0.1),
     0rem 24px 24px rgba(10, 60, 255, 0.09),
@@ -745,6 +752,61 @@ footer a:hover {
     transform: rotate(360deg);
   }
 }
+
+ @media (max-width: 768px) {
+            header nav {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+            #ttop{
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            
+            .side-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background: url('schbg.jpeg') no-repeat center center / cover;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                z-index: 2;
+                transition: right 0.3s ease-in-out;
+                overflow: hidden;
+            }
+            .side-menu.open {
+                right: 0;
+            }
+
+            #hamburger {
+                display: block;
+            }
+            
+            .video-container {
+                flex-direction: column;
+            }
+
+            /* THIS IS THE CORRECTED MOBILE STYLE FOR VIDEOS */
+            .video-wrapper iframe {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .side-menu, .close-icon, #hamburger {
+                display: none !important;
+            }
+        }
 
     </style>
 </head>
@@ -989,8 +1051,15 @@ footer a:hover {
   
   </div>
   <h3 id="ttop1">Association Members</h3>
-            <iframe padding-top="20px" width="800" height="450" src="https://www.youtube.com/embed/jfKfPfyJRdk"  title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
+            <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/jfKfPfyJRdk" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
     <script>
         function toggleMenu() {
             const sideMenu = document.getElementById('sideMenu');
@@ -1073,7 +1142,7 @@ footer a:hover {
             // Select all boxes again (originals + new clones)
             const allBoxes = Array.from(wrapper.querySelectorAll(".box"));
             const scrollDistance = totalWidth;
-            const duration = 35; // Adjust for speed
+            const duration = 60; // Adjust for speed
 
             // GSAP Animation
             animation = gsap.to(allBoxes, {
