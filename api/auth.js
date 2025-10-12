@@ -148,13 +148,7 @@ router.post("/register", async (req, res) => {
       Pass,
     } = req.body;
 
-    // ✅ Validation
-    if (
-      !name || !college || !department || !reg_no || !year || !phone ||
-      !email || !password || !accommodation || !role || !transid || !Pass
-    ) {
-      return res.status(400).json({ error: "All fields are required!" });
-    }
+   
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
