@@ -316,8 +316,7 @@
     </header>
     <div class="register-container">
         <h1>Register</h1>
-        <form id="registerForm" method="POST" action="/register">
-            <div class="form-group">
+        <form id="registerForm" method="POST" action="/register" novalidate> <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required>
             </div>
@@ -402,55 +401,49 @@
     </footer>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
+        console.log("DEBUG: DOM fully loaded. Script is running."); // DEBUG
+
         const form = document.getElementById("registerForm");
         const roleSelect = document.getElementById('role');
-
-        // Get all the role-specific groups
         const adminKeyGroup = document.getElementById('adminKeyGroup');
         const transidGroup = document.getElementById('transidGroup');
         const passGroup = document.getElementById('passGroup');
         const qrCodeGroup = document.getElementById('qrCodeGroup');
         const accommodationGroup = document.getElementById('accommodationGroup');
-
-        // Get the actual input fields to toggle their 'required' status
         const adminKeyInput = document.getElementById('admin_key');
         const transidInput = document.getElementById('transid');
         const passSelect = document.getElementById('Pass');
         const accommodationSelect = document.getElementById('accommodation');
         const qrCodeImage = document.getElementById('qrCode');
 
-        // Event listener for the role dropdown
         roleSelect.addEventListener('change', () => {
             const selectedRole = roleSelect.value;
+            console.log("DEBUG: Role changed to ->", selectedRole); // DEBUG
 
-            // Determine if the role is 'admin' or 'user'
             const isAdmin = selectedRole === 'admin';
             const isUser = selectedRole === 'user';
 
-            // Toggle visibility of form groups based on role
             adminKeyGroup.style.display = isAdmin ? 'block' : 'none';
             passGroup.style.display = isUser ? 'block' : 'none';
             transidGroup.style.display = isUser ? 'block' : 'none';
             accommodationGroup.style.display = isUser ? 'block' : 'none';
 
-            // **THE KEY FIX**: Dynamically set the 'required' attribute
             adminKeyInput.required = isAdmin;
             passSelect.required = isUser;
             transidInput.required = isUser;
             accommodationSelect.required = isUser;
+            
+            console.log("DEBUG: Admin key required? ->", adminKeyInput.required); // DEBUG
+            console.log("DEBUG: Participant fields required? ->", passSelect.required); // DEBUG
 
-            // Hide the QR code group if the role is not 'user'
             if (!isUser) {
                 qrCodeGroup.style.display = 'none';
-                passSelect.value = ''; // Reset the pass selection
+                passSelect.value = '';
             }
         });
 
-        // This function is defined but not implemented in the original code.
-        // You might need to add logic here, e.g., redirecting to a profile page.
         function checkAuth(event) {
             event.preventDefault();
-            // Example: check if a token exists in localStorage
             if (localStorage.getItem('authToken')) {
                 window.location.href = 'profile.html';
             } else {
@@ -462,12 +455,12 @@
         document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
         document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
-        // Event listener for the registration type dropdown
         passSelect.addEventListener('change', () => {
+            console.log("DEBUG: Pass type changed to ->", passSelect.value); // DEBUG
             if (passSelect.value === 'single') {
                 qrCodeImage.src = 'singleqr.jpg';
                 qrCodeGroup.style.display = 'block';
-            } else if (passSelect.value === 'blaze') { // Corrected value
+            } else if (passSelect.value === 'blaze') {
                 qrCodeImage.src = 'blazeqr_250.jpg';
                 qrCodeGroup.style.display = 'block';
             } else {
@@ -477,6 +470,8 @@
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
+            console.log("DEBUG: Form submission intercepted."); // DEBUG
+
             const phoneInput = document.getElementById('phone');
             if (!/^\d{10}$/.test(phoneInput.value)) {
                 alert("Please enter a valid 10-digit phone number.");
@@ -485,6 +480,9 @@
 
             const formData = new FormData(form);
             const formObject = Object.fromEntries(formData.entries());
+            
+            console.log("DEBUG: Sending this data to the server ->", JSON.stringify(formObject, null, 2)); // DEBUG
+
             try {
                 const response = await fetch("https://phantasm-blaze.onrender.com/api/auth/register", {
                     method: "POST",
@@ -493,11 +491,13 @@
                     },
                     body: JSON.stringify(formObject),
                 });
+                
                 const result = await response.json();
+                console.log("DEBUG: Received this response from server ->", result); // DEBUG
+
                 if (response.ok) {
                     alert(result.message || "Registered successfully!");
                     form.reset();
-                    // Manually reset the display of dynamic fields after submission
                     adminKeyGroup.style.display = 'none';
                     transidGroup.style.display = 'none';
                     passGroup.style.display = 'none';
@@ -510,7 +510,7 @@
                     alert(result.error || "Registration failed!");
                 }
             } catch (error) {
-                console.error("Registration error:", error);
+                console.error("DEBUG: A critical error occurred during fetch ->", error); // DEBUG
                 alert("Something went wrong! Please try again.");
             }
         });
@@ -520,9 +520,7 @@
         const sideMenu = document.getElementById('sideMenu');
         const hamburger = document.getElementById('hamburger');
         const closeIcon = document.getElementById('closeIcon');
-
         sideMenu.classList.toggle('open');
-
         if (sideMenu.classList.contains('open')) {
             hamburger.style.display = 'none';
             closeIcon.style.display = 'block';
