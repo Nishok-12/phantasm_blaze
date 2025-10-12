@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="logo.png" type="image/x-icon">
+      <link rel="preload" as="image" href="schbg.jpeg">
+    <title>Contributors</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Caudex&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'New Rocker', system-ui; /* Quoted font name */
+            font-weight: 400;
+            font-style: normal;
+            background: url('schbg.jpeg') no-repeat center center / cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        header, footer {
+            background: transparent;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100px;
+            overflow: hidden;
+        }
+
+        .button-cont {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-bottom: 2rem;
+          gap: 1rem;
+        }
+
+        
+
+        .wrapper {
+          background: rgba(0,0,0,0.5);
+          backdrop-filter:blur(20px);
+          border-radius:15px;
+          height: 150px;
+          max-height: 15vh;
+          width:100%;
+          max-width: 100%;
+          border-left: dashed 2px #7c7c6f;;
+          border-right: dashed 2px #7c7c6f;
+          position: relative;
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          margin: 20px auto; /* Added margin for spacing */
+        }
+
+        .carousel {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .box {
+          padding: 0.5rem;
+          flex-shrink: 0;
+          height: 80%;
+          width: auto;
+          min-width: 150px;
+        }
+
+        .box__inner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          font-size: 21px;
+          cursor: pointer;
+          width: 100%;
+          height: 100%;
+          padding: 0 15px;
+        }
+
+        .show-overflow {
+          overflow: visible;
+        }
+
+        .box .box__inner {
+          background: linear-gradient(#0e100f, #0e100f)
+              padding-box,
+            var(--gradient) border-box;
+          border: 3px solid transparent;
+          border-radius: 10px;
+        }
+
+        .box {
+          --gradient: linear-gradient(
+            114.41deg,
+             #BA1615 20.74%,
+            #E04231 65.5%
+          );
+        }
+
+        .box p {
+          -webkit-text-fill-color: transparent;
+          background: var(--gradient);
+          -webkit-background-clip: text;
+          background-clip: text;
+          font-size: 1.5rem;
+        }
+
+        #page-title{
+           font-size:50px;
+           -webkit-text-fill-color: transparent;
+           background: linear-gradient(45deg, #F06338 20.74%,#AE140C 65.5%) ;
+           -webkit-background-clip: text;
+          background-clip: text;
+        }
+
+        #glass{
+            background: rgba(0,0,0,0.5);
+            backdrop-filter:blur(20px);
+            padding: 0px 25px;
+            border-radius:15px 15px 0 0;
+        }
+
+        header {
+            padding: 0 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        header .logo {
+            font-family: 'New Rocker', system-ui; /* Quoted font name */
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.5em;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        header nav {
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            transition: color 0.3s;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 3;
+            position: relative;
+            padding: 10px;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 4px 0;
+            transition: all 0.3s;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .close-icon {
+            display: none;
+            position: relative;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            z-index: 3;
+            font-size: 2em;
+            color: white;
+        }
+
+        .side-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+
+        .side-menu a:hover {
+            color: #f0a500;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        header nav a:hover {
+            color: #cc3b6e;
+        }
+
+        footer {
+            font-family: 'New Rocker', system-ui; /* Quoted font name */
+            font-weight: 400;
+            font-style: normal;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: auto; /* Pushes footer to the bottom */
+        }
+
+        footer p {
+            margin: 5px 0;
+            z-index: 10;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #cc3b6e;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        #ttop {
+            font-size: 26px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color:white;
+            margin-bottom: 0px;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            header nav {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .side-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background: url('schbg.jpeg') no-repeat center center / cover;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                z-index: 2;
+                transition: right 0.3s ease-in-out;
+                overflow: hidden;
+            }
+            .side-menu.open {
+                right: 0;
+            }
+            #hamburger {
+                display: block;
+            }
+            #ttop{
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .side-menu, .close-icon, #hamburger {
+                 display: none !important;
+             }
+        }
+
+
+          h3{
+    text-decoration: none;
+    color:white;
+    
+  }
+
+  #font{
+    font-size: 25px;
+  }
+
+  u{
+    text-decoration: none;
+  }
+    /*header footer*/
+  
+    header, footer {
+      position: relative;
+      background: transparent;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100px;
+      overflow: hidden;
+  }
+
+  header {
+    padding: 0 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+header .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    z-index: 2;
+}
+
+header nav {
+  display: flex;
+  gap: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+header nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1em;
+  transition: color 0.3s;
+}
+header nav a:hover {
+  color: #cc3b6e;
+}
+
+.hamburger {
+  display: none;  /* Hide the hamburger by default */
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 3;
+  position: relative;
+  padding: 10px;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 4px 0;
+  transition: all 0.3s;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.close-icon {
+  display: none;
+  position: relative;
+  right: 15px;
+  cursor: pointer;
+  z-index: 3;
+  font-size: 2em;
+  color: white;
+}
+
+.side-menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+}
+
+.side-menu a:hover {
+  color: #cc3b6e;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+footer p {
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+footer a {
+  color: #cc3b6e;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  header nav {
+      display: none;
+  }
+
+  .hamburger {
+      display: flex; /* Show hamburger only on mobile view */
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger {
+      display: none; /* Hide hamburger on desktop and larger screens */
+  }
+
+  header nav {
+      display: flex; /* Show normal navigation on desktop */
+  }
+}
+
+
+@media (min-width: 769px) {
+  .side-menu {
+      display: none !important;  /* Hide side menu when header content is visible */
+  }
+
+  .close-icon {
+      display: none !important;  /* Hide side menu when header content is visible */
+  }
+
+ #hamburger {
+      display: none !important;  /* Hide hamburger icon on larger screens */
+  }
+}
+
+@media (min-width: 769px) {
+  .hamburger {
+      display: none; /* Hide hamburger on desktop and larger screens */
+  }
+
+  header nav {
+      display: flex; /* Show normal navigation on desktop */
+  }
+}
+
+
+@media (min-width: 769px) {
+  .side-menu {
+      display: none !important;  /* Hide side menu when header content is visible */
+  }
+
+  .close-icon {
+      display: none !important;  /* Hide side menu when header content is visible */
+  }
+
+ #hamburger {
+      display: none !important;  /* Hide hamburger icon on larger screens */
+  }
+}
+
+
+@media (max-width: 768px) {
+  .side-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 250px;
+      height: 100vh;
+      background: url('schbg.jpeg') no-repeat center center / cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 2;
+      transition: right 0.3s ease-in-out;
+      overflow: hidden;
+  }
+  .side-menu.open {
+      right: 0;
+  }
+  
+  #hamburger {
+      display: block; /* Show hamburger only in mobile view */
+  }
+  }
+
+
+   /* Main Content (Map and Boxes) */
+   .content {
+    margin-top: 60px; /* Adjust for fixed header */
+    background: white;
+
+  }
+
+  
+  /* General Styles */
+  .mapp {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    height: 300px;
+    border: 0;
+    display: block;
+  }
+  .map:hover{
+    box-shadow: rgb(248, 246, 246) 2px;
+  }
+  .com, .ro {
+    text-align: center;
+    color: rgb(240, 231, 231);
+    margin: 20px 0;
+  }
+  .new {
+    text-align: center;
+    color: rgb(249, 244, 244);
+    margin: 10px 0;
+  }
+
+/* Popup Container */
+.popup-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  text-decoration: none; 
+  margin: 20px auto;
+  width: 90%;
+}
+
+/* Popup Boxes with Glassmorphism Effect */
+.popup-box, .popup-boxa, .popup-boxb, .popup-boxc {
+  background: rgba(193, 78, 78, 0.393);  /* Transparent effect */
+  backdrop-filter: blur(10px); /* Glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari Support */
+  border-radius: 15px;
+  padding: 20px;
+  width: 200px;
+  text-decoration: none;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover Effects */
+.popup-box:hover, .popup-boxa:hover, .popup-boxb:hover, .popup-boxc:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Text Colors */
+.popup-box h3, 
+.popup-boxa h3, 
+.popup-boxb h3, 
+.popup-boxc h3 {
+  color: #f8f8f8;
+  font-size: 1em;
+  letter-spacing: 1px;
+  text-decoration: none !important; /* Ensures underline is removed */
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .popup-container {
+      flex-direction: column;
+      align-items: center;
+  }
+  
+
+}
+
+
+  /* Route Section */
+  .route-section {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    color: rgb(247, 243, 243);
+  }
+  .route-item {
+    width: 45%;
+    min-width: 200px;
+  }
+  .route-item ul {
+    padding-left: 20px;
+  }
+
+  /* Footer 
+  .domn {
+    text-align: center;
+    color: aliceblue;
+    margin: 20px 0;
+  }*/
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .popup-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    .route-section {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .route-item {
+      width: 100%;
+    }
+  }
+
+  /* CARD FOR INTER COLLEGE COMMITTEE */
+  /* From Uiverse.io by gharsh11032000 */ 
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  padding: 2px;
+  border-radius: 24px;
+  overflow: hidden;
+  line-height: 1.6;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 34px;
+  border-radius: 22px;
+  color: #ffffff;
+  overflow: hidden;
+  background: #ffffff;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.content .heading {
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.3;
+  z-index: 1;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.content .para {
+  z-index: 1;
+  opacity: 0.8;
+  font-size: 18px;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  height: 160%;
+  width: 160%;
+  border-radius: inherit;
+  background: #0a3cff;
+  background: linear-gradient(to right, #0a3cff, #0a3cff);
+  transform-origin: center;
+  animation: moving 4.8s linear infinite paused;
+  transition: all 0.88s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card:hover::before {
+  animation-play-state: running;
+  z-index: -1;
+  width: 20%;
+}
+
+.card:hover .content .heading,
+.card:hover .content .para {
+  color: #000000;
+}
+
+.card:hover {
+  box-shadow: 0rem 6px 13px rgba(10, 60, 255, 0.1),
+    0rem 24px 24px rgba(10, 60, 255, 0.09),
+    0rem 55px 33px rgba(10, 60, 255, 0.05),
+    0rem 97px 39px rgba(10, 60, 255, 0.01), 0rem 152px 43px rgba(10, 60, 255, 0);
+  scale: 1.05;
+  color: #000000;
+}
+
+@keyframes moving {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Phantasm Blaze</div>
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+            <a href="profile.html" id="profileLinkDesktop">Profile</a>
+            <a href="login.html">Login</a>
+            <a href="contributors.html">Contributors</a>
+            <a href="gallery.html">Gallery</a>
+        </nav>
+        <div class="side-menu" id="sideMenu">
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+            <a href="#" id="profileLinkMobile">Profile</a>
+            <a href="login.html">Login</a>
+            <a href="contributors.html">Contributors</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </header>
+
+    <h3 id="ttop">Website Team</h3>
+    <div class="wrapper">
+      <div class="box"><div class="box__inner"><p>Varshini R</p></div></div>
+<div class="box"><div class="box__inner"><p>Akshaya N</p></div></div>
+<div class="box"><div class="box__inner"><p>Brightlin Blessy S</p></div></div>
+<div class="box"><div class="box__inner"><p>Govardhanan P</p></div></div>
+<div class="box"><div class="box__inner"><p>Logeshwaraiyyan S</p></div></div>
+<div class="box"><div class="box__inner"><p>Naveen</p></div></div>
+<div class="box"><div class="box__inner"><p>Ahamed Shafeel M</p></div></div>
+<div class="box"><div class="box__inner"><p>Jayam V</p></div></div>
+<div class="box"><div class="box__inner"><p>Mugilan R</p></div></div>
+<div class="box"><div class="box__inner"><p>Sudharsan G R</p></div></div>
+<div class="box"><div class="box__inner"><p>Deepashree V</p></div></div>
+<div class="box"><div class="box__inner"><p>Janani K</p></div></div>
+<div class="box"><div class="box__inner"><p>Kaviya P</p></div></div>
+<div class="box"><div class="box__inner"><p>Shylaja R</p></div></div>
+<div class="box"><div class="box__inner"><p>Suganya T</p></div></div>
+<div class="box"><div class="box__inner"><p>Mahee Fizra K</p></div></div>
+<div class="box"><div class="box__inner"><p>Karthik B</p></div></div>
+<div class="box"><div class="box__inner"><p>Arjun M</p></div></div>
+<div class="box"><div class="box__inner"><p>Kishore Kumar B</p></div></div>
+<div class="box"><div class="box__inner"><p>Zeelan I</p></div></div>
+<div class="box"><div class="box__inner"><p>Ponarasu S</p></div></div>
+<div class="box"><div class="box__inner"><p>Gokulapriya D</p></div></div>
+<div class="box"><div class="box__inner"><p>Afreen M</p></div></div>
+<div class="box"><div class="box__inner"><p>Gayathri A</p></div></div>
+<div class="box"><div class="box__inner"><p>Hemalatha S</p></div></div>
+<div class="box"><div class="box__inner"><p>Thenmozhi M</p></div></div>
+<div class="box"><div class="box__inner"><p>Keerthivasan R</p></div></div>
+<div class="box"><div class="box__inner"><p>Mynavathi G</p></div></div>
+<div class="box"><div class="box__inner"><p>Mynavathi G</p></div></div>
+<div class="box"><div class="box__inner"><p>Mahalakshmi M</p></div></div>
+<div class="box"><div class="box__inner"><p>Keerthana V</p></div></div>
+<div class="box"><div class="box__inner"><p>Deepika P</p></div></div>
+<div class="box"><div class="box__inner"><p>Balasubramani A</p></div></div>
+<div class="box"><div class="box__inner"><p>Vignesh P</p></div></div>
+<div class="box"><div class="box__inner"><p>Elango M</p></div></div>
+<div class="box"><div class="box__inner"><p>Nishok A</p></div></div>
+    </div>
+
+    <main>
+    <!-- Committee Section -->
+<div class="com">
+    <u><h3 id="font">Software and Network Team</h3></u>
+  </div>
+  <div class="popup-container">
+    <div class="popup-box">
+      <u><h3 >VARSHINI R</h3></u>
+      Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>AKSHAYA N</h3></u>
+      Final Year<br>
+    </div>
+  <div class="popup-box">
+    <u><h3>BRIGHTLIN BLESSY S</h3></u>
+     Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>GOVARDHANAN P</h3></u>
+      Final Yea<br>
+    </div>
+    <div class="popup-box">
+    <u><h3>LOGESHWARAIYYAN S</h3></u>
+     Final Year<br>
+  </div>
+  </div>
+  
+  <div class="com">
+    <u><h3 id="font">Frontend Developers</h3></u>
+  </div>
+  <div class="popup-container">
+    <div class="popup-box">
+      <u><h3>NAVEEN/h3></u>
+      M.E. Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>AHAMED SHAFEEL M</h3></u>
+      Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>JAYAM V</h3></u>
+      Final Year<br>
+    </div>
+  <div class="popup-box">
+    <u><h3>MUGILAN R</h3></u>
+     Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>SUDHARSAN G R</h3></u>
+      Final Year<br>
+    </div>
+    <div class="popup-box">
+    <u><h3>DEEPASHREE V</h3></u>
+     Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>JANANI K</h3></u>
+      Final Yea<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>KAVIYA P</h3></u>
+      Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>SHYLAJA R</h3></u>
+      Final Year<br>
+    </div>
+  <div class="popup-box">
+    <u><h3>SUGANYA T</h3></u>
+     Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>MAHEE FIZRA K</h3></u>
+      Final Yea<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>KARTHIK B</h3></u>
+      Pre-Final Year<br>
+    </div>
+    <div class="popup-box">
+    <u><h3>ARJUN M</h3></u>
+     Pre-Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>KISHORE KUMAR B</h3></u>
+      Pre-Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>ZEELAN I</h3></u>
+      Pre-Final Year<br>
+    </div>
+    
+  <div class="popup-box">
+    <u><h3>PONARASU S</h3></u>
+    Pre-Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>GOKULAPRIYA D</h3></u>
+      Pre-Final Year<br>
+    </div>
+    <div class="popup-box">
+    <u><h3>AFREEN M</h3></u>
+     Pre-Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>GAYATHRI A</h3></u>
+      Pre-Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>HEMALATHA S</h3></u>
+      Pre-Final Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>THENMOZHI M</h3></u>
+      Pre-Final Year<br>
+    </div>
+  <div class="popup-box">
+    <u><h3>KEERTHIVASAN R</h3></u>
+    Pre-Final Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>MYNAVATHI G</h3></u>
+      Second Year<br>
+    </div>
+    <div class="popup-box">
+    <u><h3>MYNAVATHI G</h3></u>
+     Second Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>MAHALAKSHMI M</h3></u>
+      Second Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>KEERTHANA V</h3></u>
+      Second Year<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>DEEPIKA P</h3></u>
+     Second Year<br>
+    </div>
+  <div class="popup-box">
+    <u><h3>BALASUBRAMANI A</h3></u>
+    Second Year<br>
+  </div>
+    <div class="popup-box">
+      <u><h3>VIGNESH P</h3></u>
+      Second Year<br>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="com">
+    <u><h3 id="font">Backend Developers</h3></u>
+  </div>
+  <div class="popup-container">
+    <div class="popup-box">
+      <u><h3>ELANGO M</h3></u>
+      Final Year (2021-2025)<br>
+    </div>
+    <div class="popup-box">
+      <u><h3>NISHOK A</h3></u>
+      Final Year<br>
+    </div>
+    
+  </div>
+  </div>
+
+    <script>
+        function toggleMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            const hamburger = document.getElementById('hamburger');
+            const closeIcon = document.getElementById('closeIcon');
+
+            sideMenu.classList.toggle('open');
+
+            if (sideMenu.classList.contains('open')) {
+                hamburger.style.display = 'none';
+                closeIcon.style.display = 'block';
+            } else {
+                hamburger.style.display = 'flex';
+                closeIcon.style.display = 'none';
+            }
+        }
+
+        document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+        document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+
+        async function checkAuth(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch("/api/user/check-auth", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    window.location.href = "/profile.html";
+                } else {
+                    alert("Login first!");
+                    window.location.href = "/login.html";
+                }
+            } catch (error) {
+                console.error("Error checking authentication:", error);
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        }
+
+        document.querySelector('.logo').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+
+        let animation;
+
+        function createSeamlessScroll() {
+            const wrapper = document.querySelector(".wrapper");
+            if (animation) animation.kill();
+
+            const originalBoxes = Array.from(wrapper.querySelectorAll(".box:not(.clone)"));
+            
+            wrapper.innerHTML = "";
+            originalBoxes.forEach(box => {
+                gsap.set(box, { x: 0 });
+                wrapper.appendChild(box);
+            });
+
+            const totalWidth = originalBoxes.reduce((acc, box) => acc + box.offsetWidth, 0);
+            const screenWidth = wrapper.offsetWidth;
+            const clonesNeeded = Math.ceil(screenWidth / totalWidth) + 1;
+
+            for (let i = 0; i < clonesNeeded; i++) {
+                originalBoxes.forEach(box => {
+                    const clone = box.cloneNode(true);
+                    clone.classList.add("clone");
+                    gsap.set(clone, { x: 0 });
+                    wrapper.appendChild(clone);
+                });
+            }
+
+            const allBoxes = Array.from(wrapper.querySelectorAll(".box"));
+            const scrollDistance = totalWidth;
+            const duration = 35; // Increased duration for a slower, smoother scroll
+
+            animation = gsap.to(allBoxes, {
+                x: `-=${scrollDistance}`, // CRITICAL FIX: Corrected syntax
+                duration: duration,
+                ease: "none",
+                repeat: -1,
+                modifiers: {
+                    x: gsap.utils.unitize(x => parseFloat(x) % scrollDistance)
+                }
+            });
+        }
+        
+        createSeamlessScroll();
+
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(createSeamlessScroll, 200);
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2025 CSEA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

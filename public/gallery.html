@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <link rel="preload" as="image" href="schbg.jpeg">
+    <title>Gallery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Caudex&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=UnifrakturCook:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: "New Rocker", system-ui;
+            font-weight: 400;
+            font-style: normal;
+            background: url('schbg.jpeg') no-repeat center center / cover;
+            background-size: 100% 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        header, footer {
+            background: transparent;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100px;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 0 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        header .logo {
+            font-family: "New Rocker", system-ui;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.5em;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        header nav {
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            transition: color 0.3s;
+        }
+
+        .hamburger {
+            display: none; /* Hide the hamburger by default */
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 3;
+            position: relative;
+            padding: 10px;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 4px 0;
+            transition: all 0.3s;
+        }
+        
+        .close-icon {
+            display: none;
+            position: relative;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            z-index: 3;
+            font-size: 2em;
+            color: white;
+        }
+
+        .side-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+
+        .side-menu a:hover {
+            color: #f0a500;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        header nav a:hover {
+            color: #cc3b6e;
+        }
+
+        footer {
+            font-family: "New Rocker", system-ui;
+            font-weight: 400;
+            font-style: normal;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        footer p {
+            margin: 5px 0;
+            z-index: 10;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #cc3b6e;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        #ttop {
+            font-size: 26px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color:white;
+            margin-bottom: 0px;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+        }
+
+        /* ====== Video Container Styles ====== */
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 40px;
+        }
+
+        .video-wrapper {
+            flex: 1;
+            max-width: 640px; /* Limits how far apart videos can get on wide screens */
+            display: flex;
+            justify-content: center;
+        }
+
+        .video-wrapper iframe {
+            /* Applied fixed dimensions for DESKTOP */
+            width: 638px;
+            height: 358.88px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            header nav {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+            #ttop{
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            
+            .side-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background: url('schbg.jpeg') no-repeat center center / cover;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                z-index: 2;
+                transition: right 0.3s ease-in-out;
+                overflow: hidden;
+            }
+            .side-menu.open {
+                right: 0;
+            }
+
+            #hamburger {
+                display: block;
+            }
+            
+            .video-container {
+                flex-direction: column;
+            }
+
+            /* THIS IS THE CORRECTED MOBILE STYLE FOR VIDEOS */
+            .video-wrapper iframe {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .side-menu, .close-icon, #hamburger {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+    function toggleMenu() {
+        const sideMenu = document.getElementById('sideMenu');
+        const hamburger = document.getElementById('hamburger');
+        const closeIcon = document.getElementById('closeIcon');
+        sideMenu.classList.toggle('open');
+        if (sideMenu.classList.contains('open')) {
+            hamburger.style.display = 'none';
+            closeIcon.style.display = 'block';
+        } else {
+            hamburger.style.display = 'flex';
+            closeIcon.style.display = 'none';
+        }
+    }
+    </script>
+
+    <header>
+        <div class="logo">Phantasm Blaze</div>
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="close-icon" id="closeIcon" onclick="toggleMenu()">&#x2715;</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+            <a href="profile.html" id="profileLinkDesktop">Profile</a>
+            <a href="login.html">Login</a>
+            <a href="contributors.html">Contributors</a>
+            <a href="gallery.html">Gallery</a>
+        </nav>
+        <div class="side-menu" id="sideMenu">
+            <a href="index.html">Home</a>
+            <a href="events.html">Events</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact-us.html">Contact</a>
+            <a href="#" id="profileLinkMobile">Profile</a>
+            <a href="login.html">Login</a>
+            <a href="contributors.html">Contributors</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+    </header>
+
+    <H3 id="ttop">Blaze Gallery</H3>
+
+    <div class="video-container">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/jfKfPfyJRdk" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/YykjpeuMNEk" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <div class="video-container">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/3_yoa-3GdfA" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/6Jnkbtr4IVw" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+        document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
+
+        async function checkAuth(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch("/api/user/check-auth", {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (response.ok) {
+                    window.location.href = "/profile.html";
+                } else {
+                    alert("Login first!");
+                    window.location.href = "/login.html";
+                }
+            } catch (error) {
+                console.error("Error checking authentication:", error);
+                alert("Login first!");
+                window.location.href = "/login.html";
+            }
+        }
+
+        document.querySelector('.logo').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
+    <footer>
+        <p>&copy; 2025 CSEA. All rights reserved.</p>
+    </footer>
+</body>
+</html>

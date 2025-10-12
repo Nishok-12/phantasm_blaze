@@ -268,7 +268,7 @@ footer a:hover {
 
 /* Popup Boxes with Glassmorphism Effect */
 .popup-box, .popup-boxa, .popup-boxb, .popup-boxc {
-  background: rgba(255, 255, 255, 0.2);  /* Transparent effect */
+  background: rgba(193, 78, 78, 0.393);  /* Transparent effect */
   backdrop-filter: blur(10px); /* Glass effect */
   -webkit-backdrop-filter: blur(10px); /* Safari Support */
   border-radius: 15px;
