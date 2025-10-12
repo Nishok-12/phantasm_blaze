@@ -8,7 +8,7 @@ const router = express.Router();
 // ✅ Mark Attendance Route (Admin Only)
 router.post("/mark-attendance", requireAuth, requireAdmin, async (req, res) => {
     const { qr_code_id, event_id } = req.body;
-    const adminId = req.user?.id;  // Ensure adminId is extracted properly
+    const adminId = req.user?.id;
 
     if (!qr_code_id || !event_id) {
         return res.status(400).json({ success: false, message: "QR Code ID and Event ID are required." });
@@ -24,24 +24,40 @@ router.post("/mark-attendance", requireAuth, requireAdmin, async (req, res) => {
         if (event.length === 0) return res.status(404).json({ success: false, message: "Event ID not found!" });
 
         const userId = user[0].id;
+        const numericEventId = parseInt(event_id, 10); // Ensure event_id is a number
 
-        // ✅ Insert registration if not exists
-        await db.query(`
-            INSERT INTO registrations (user_id, event_id) 
-            SELECT ?, ? FROM DUAL 
-            WHERE NOT EXISTS (
-                SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?
-            )`, [userId, event_id, userId, event_id]);
+        // --- ⬇️ NEW LOGIC START ⬇️ ---
 
-        // ✅ Check if attendance is already marked
-        const [attendance] = await db.query("SELECT id FROM attendance WHERE event_id = ? AND user_id = ?", [event_id, userId]);
+        // ✅ Conditional logic based on event_id
+        if (numericEventId >= 1 && numericEventId <= 9) {
+            // For events 1-9, check for existing registration. DO NOT auto-register.
+            const [registration] = await db.query("SELECT id FROM registrations WHERE user_id = ? AND event_id = ?", [userId, numericEventId]);
+            
+            if (registration.length === 0) {
+                // If no registration is found, return an error.
+                return res.status(403).json({ success: false, message: "User didn't register for this event." });
+            }
+        } else {
+            // For all other events, use the original "insert if not exists" logic to auto-register.
+            await db.query(`
+                INSERT INTO registrations (user_id, event_id) 
+                SELECT ?, ? FROM DUAL 
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?
+                )`, [userId, numericEventId, userId, numericEventId]);
+        }
+
+        // --- ⬆️ NEW LOGIC END ⬆️ ---
+
+        // ✅ Check if attendance is already marked (this logic remains the same)
+        const [attendance] = await db.query("SELECT id FROM attendance WHERE event_id = ? AND user_id = ?", [numericEventId, userId]);
         if (attendance.length > 0) return res.status(400).json({ success: false, message: "Attendance already marked!" });
 
-        // ✅ Mark attendance
+        // ✅ Mark attendance (this logic remains the same)
         await db.query("INSERT INTO attendance (event_id, user_id, admin_id, attendance_status) VALUES (?, ?, ?, 'present')", 
-            [event_id, userId, adminId]);
+            [numericEventId, userId, adminId]);
 
-        res.json({ success: true, message: "User registered and attendance marked successfully!" });
+        res.json({ success: true, message: "Attendance marked successfully!" });
 
     } catch (err) {
         console.error("❌ Database error:", err);
