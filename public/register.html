@@ -167,18 +167,18 @@
     }
 
     @media (min-width: 769px) {
-     .side-menu {
-         display: none !important;  /* Hide side menu when header content is visible */
-     }
+       .side-menu {
+          display: none !important;  /* Hide side menu when header content is visible */
+       }
 
-     .close-icon {
-         display: none !important;  /* Hide side menu when header content is visible */
-     }
+       .close-icon {
+          display: none !important;  /* Hide side menu when header content is visible */
+       }
 
-    #hamburger {
-         display: none !important;  /* Hide hamburger icon on larger screens */
-     }
-  }
+       #hamburger {
+          display: none !important;  /* Hide hamburger icon on larger screens */
+       }
+   }
 
   @media (max-width: 768px) {
 .side-menu {
@@ -258,7 +258,7 @@
         .form-group select:focus {
             background-color: white; /* Change background color when focused */
             color: black; /* Change text color when focused */
-        }  
+        }       
         
         .form-group button {
             width: 100%;
@@ -365,7 +365,7 @@
             </div>
             <div class="form-group" id="passGroup" style="display: none;">
                 <label for="Pass">Registration Type</label>
-                <select id="Pass" name="Pass">
+                <select id="Pass" name="blaze">
                     <option value="" disabled selected>Do you pay 150Rs.(Single) or 250Rs.(Blaze)?</option>
                     <option value="blaze">Blaze Pass</option>
                     <option value="single">Single Event</option>
@@ -404,52 +404,70 @@
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("registerForm");
         const roleSelect = document.getElementById('role');
-        const adminKeyGroup = document.getElementById('adminKeyGroup');
-        const adminKeyInput = document.getElementById('admin_key');
 
-        // New elements for the requested functionality
+        // Get all the role-specific groups
+        const adminKeyGroup = document.getElementById('adminKeyGroup');
         const transidGroup = document.getElementById('transidGroup');
         const passGroup = document.getElementById('passGroup');
-        const passSelect = document.getElementById('Pass');
         const qrCodeGroup = document.getElementById('qrCodeGroup');
+        const accommodationGroup = document.getElementById('accommodationGroup');
+
+        // Get the actual input fields to toggle their 'required' status
+        const adminKeyInput = document.getElementById('admin_key');
+        const transidInput = document.getElementById('transid');
+        const passSelect = document.getElementById('Pass');
+        const accommodationSelect = document.getElementById('accommodation');
         const qrCodeImage = document.getElementById('qrCode');
-        const accommodationGroup = document.getElementById('accommodationGroup'); // Get the new accommodation element
 
         // Event listener for the role dropdown
         roleSelect.addEventListener('change', () => {
-            if (roleSelect.value === 'admin') {
-                // Show admin key field and hide participant fields
-                adminKeyGroup.style.display = 'block';
-                transidGroup.style.display = 'none';
-                passGroup.style.display = 'none';
+            const selectedRole = roleSelect.value;
+
+            // Determine if the role is 'admin' or 'user'
+            const isAdmin = selectedRole === 'admin';
+            const isUser = selectedRole === 'user';
+
+            // Toggle visibility of form groups based on role
+            adminKeyGroup.style.display = isAdmin ? 'block' : 'none';
+            passGroup.style.display = isUser ? 'block' : 'none';
+            transidGroup.style.display = isUser ? 'block' : 'none';
+            accommodationGroup.style.display = isUser ? 'block' : 'none';
+
+            // **THE KEY FIX**: Dynamically set the 'required' attribute
+            adminKeyInput.required = isAdmin;
+            passSelect.required = isUser;
+            transidInput.required = isUser;
+            accommodationSelect.required = isUser;
+
+            // Hide the QR code group if the role is not 'user'
+            if (!isUser) {
                 qrCodeGroup.style.display = 'none';
-                accommodationGroup.style.display = 'none'; // Hide accommodation for admin
-            } else if (roleSelect.value === 'user') {
-                // Show participant fields and hide admin key field
-                adminKeyGroup.style.display = 'none';
-                transidGroup.style.display = 'block';
-                passGroup.style.display = 'block';
-                accommodationGroup.style.display = 'block'; // Show accommodation for user
-                
-                // Reset and hide QR code when the role changes to user
-                passSelect.value = '';
-                qrCodeGroup.style.display = 'none';
-            } else {
-                // Hide all role-specific fields for initial "Select Role" option
-                adminKeyGroup.style.display = 'none';
-                transidGroup.style.display = 'none';
-                passGroup.style.display = 'none';
-                qrCodeGroup.style.display = 'none';
-                accommodationGroup.style.display = 'none';
+                passSelect.value = ''; // Reset the pass selection
             }
         });
+
+        // This function is defined but not implemented in the original code.
+        // You might need to add logic here, e.g., redirecting to a profile page.
+        function checkAuth(event) {
+            event.preventDefault();
+            // Example: check if a token exists in localStorage
+            if (localStorage.getItem('authToken')) {
+                window.location.href = 'profile.html';
+            } else {
+                alert('Please log in to view your profile.');
+                window.location.href = 'login.html';
+            }
+        }
+
+        document.getElementById("profileLinkDesktop").addEventListener("click", checkAuth);
+        document.getElementById("profileLinkMobile").addEventListener("click", checkAuth);
 
         // Event listener for the registration type dropdown
         passSelect.addEventListener('change', () => {
             if (passSelect.value === 'single') {
                 qrCodeImage.src = 'singleqr.jpg';
                 qrCodeGroup.style.display = 'block';
-            } else if (passSelect.value === 'Pass') {
+            } else if (passSelect.value === 'blaze') { // Corrected value
                 qrCodeImage.src = 'blazeqr_250.jpg';
                 qrCodeGroup.style.display = 'block';
             } else {
@@ -465,35 +483,26 @@
                 return;
             }
 
-            // Check for required fields based on role
-            if (roleSelect.value === 'admin') {
-                if (!adminKeyInput.value) {
-                    alert("Admin Key is required for Admin role.");
-                    return;
-                }
-            } else if (roleSelect.value === 'user') {
-                const transidInput = document.getElementById('transid');
-                const accommodationInput = document.getElementById('accommodation');
-                const passInput = document.getElementById('Pass');
-                
-                if (!transidInput.value || !accommodationInput.value || !passInput.value) {
-                    alert("Please fill in all required participant fields.");
-                    return;
-                }
-            }
-
             const formData = new FormData(form);
             const formObject = Object.fromEntries(formData.entries());
             try {
                 const response = await fetch("https://phantasm-blaze.onrender.com/api/auth/register", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify(formObject),
                 });
                 const result = await response.json();
                 if (response.ok) {
                     alert(result.message || "Registered successfully!");
                     form.reset();
+                    // Manually reset the display of dynamic fields after submission
+                    adminKeyGroup.style.display = 'none';
+                    transidGroup.style.display = 'none';
+                    passGroup.style.display = 'none';
+                    qrCodeGroup.style.display = 'none';
+                    accommodationGroup.style.display = 'none';
                     setTimeout(() => {
                         window.location.href = result.redirectUrl || "/login.html";
                     }, 2000);
@@ -501,6 +510,7 @@
                     alert(result.error || "Registration failed!");
                 }
             } catch (error) {
+                console.error("Registration error:", error);
                 alert("Something went wrong! Please try again.");
             }
         });
