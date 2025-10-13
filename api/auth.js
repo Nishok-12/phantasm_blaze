@@ -149,7 +149,16 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
     // ✅ Validation
-
+  if (role === 'user') {
+  // Regex to ensure the ID is exactly 12 digits
+  if (
+      !name || !college || !department || !reg_no || !year || !phone ||
+      !email || !password || !accommodation || !role || !transid || !Pass
+    ) {
+      return res.status(400).json({ error: "All fields are required!" });
+    }
+  }
+    
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
