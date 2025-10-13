@@ -149,7 +149,8 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
     // ✅ Validation
-    if (role === 'user') {
+
+
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
       return res.status(400).json({ error: "Invalid phone number! Must be 10 digits." });
@@ -225,6 +226,5 @@ if (role === 'user') {
     res.status(500).json({ error: "Server error!" });
   }
 });
-
 
 export default router;
