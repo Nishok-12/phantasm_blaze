@@ -478,6 +478,15 @@
                 return;
             }
 
+            const roleSelect = document.getElementById('role');
+            const passSelect = document.getElementById('Pass');
+
+            // CRITICAL FIX: Validate that a registration type is selected for a 'user'
+            if (roleSelect.value === 'user' && passSelect.value === "") {
+                alert("Please select a registration type (Blaze Pass or Single Event).");
+                return; // Stop the form submission
+            }
+            
             const formData = new FormData(form);
             const formObject = Object.fromEntries(formData.entries());
             
