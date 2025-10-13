@@ -568,6 +568,7 @@ a:hover {
 @media (max-width: 768px) {
     .front {
         font-size: 15px;
+        
     }
 
     .back {
@@ -653,7 +654,7 @@ a:hover {
     }
 
     .description-box {
-        height: 230px;
+        height: 330px;
     }
 
     .rules-box {
